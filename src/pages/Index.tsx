@@ -3,13 +3,16 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Eye, LogIn, User } from "lucide-react";
+import { ArrowRight, Eye, LogIn, User, FileText, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import AuthModal from "@/components/AuthModal";
 import GlassBackground from "@/components/GlassBackground";
 
 const Index = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [isLoggedIn] = useState(false); // This will be connected to actual auth state later
+  const navigate = useNavigate();
 
   const handleAuth = (mode: 'login' | 'signup') => {
     setAuthMode(mode);
@@ -34,6 +37,23 @@ const Index = () => {
     }
   ];
 
+  const quickActions = [
+    {
+      icon: <User className="w-8 h-8" />,
+      title: "Build Profile",
+      description: "Set up your professional profile",
+      action: () => navigate('/profile'),
+      color: "from-red-500 to-red-600"
+    },
+    {
+      icon: <Sparkles className="w-8 h-8" />,
+      title: "Generate Cover Letter",
+      description: "Create AI-powered cover letters",
+      action: () => navigate('/generator'),
+      color: "from-red-600 to-red-700"
+    }
+  ];
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       <GlassBackground />
@@ -50,23 +70,43 @@ const Index = () => {
             </span>
           </div>
           
-          <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              onClick={() => handleAuth('login')}
-              className="glass-button hover:glass-red"
-            >
-              <LogIn className="w-4 h-4 mr-2" />
-              Login
-            </Button>
-            <Button 
-              onClick={() => handleAuth('signup')}
-              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button"
-            >
-              <User className="w-4 h-4 mr-2" />
-              Sign Up
-            </Button>
-          </div>
+          {!isLoggedIn ? (
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="ghost" 
+                onClick={() => handleAuth('login')}
+                className="glass-button hover:glass-red"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                Login
+              </Button>
+              <Button 
+                onClick={() => handleAuth('signup')}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button"
+              >
+                <User className="w-4 h-4 mr-2" />
+                Sign Up
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="ghost" 
+                onClick={() => navigate('/profile')}
+                className="glass-button hover:glass-red"
+              >
+                <User className="w-4 h-4 mr-2" />
+                Profile
+              </Button>
+              <Button 
+                onClick={() => navigate('/generator')}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Generate
+              </Button>
+            </div>
+          )}
         </nav>
       </header>
 
@@ -90,24 +130,43 @@ const Index = () => {
             Upload your profile, paste the JD, and let our AI create compelling cover letters that get you noticed.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-slide-in">
-            <Button 
-              size="lg"
-              onClick={() => handleAuth('signup')}
-              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-4 text-lg glass-button"
-            >
-              Get Started Free
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="glass-button hover:glass-red px-8 py-4 text-lg"
-            >
-              <Eye className="mr-2 w-5 h-5" />
-              See Demo
-            </Button>
-          </div>
+          {isLoggedIn ? (
+            // Quick Actions for logged-in users
+            <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-16">
+              {quickActions.map((action, index) => (
+                <Card 
+                  key={index}
+                  className="glass-card p-6 cursor-pointer hover:scale-105 transition-all duration-300"
+                  onClick={action.action}
+                >
+                  <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${action.color} mx-auto mb-4 flex items-center justify-center text-white`}>
+                    {action.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{action.title}</h3>
+                  <p className="text-muted-foreground">{action.description}</p>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-slide-in">
+              <Button 
+                size="lg"
+                onClick={() => handleAuth('signup')}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-4 text-lg glass-button"
+              >
+                Get Started Free
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="glass-button hover:glass-red px-8 py-4 text-lg"
+              >
+                <Eye className="mr-2 w-5 h-5" />
+                See Demo
+              </Button>
+            </div>
+          )}
 
           {/* Features Grid */}
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
