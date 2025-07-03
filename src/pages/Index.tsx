@@ -65,8 +65,9 @@ const Index = () => {
             <div className="w-10 h-10 rounded-xl glass-red flex items-center justify-center">
               <span className="text-red-500 font-bold text-xl">C</span>
             </div>
+            {/* <img src='/logo1.jpeg'/> */}
             <span className="text-2xl font-bold bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
-              CoverCraft AI
+              Cover AI
             </span>
           </div>
           
