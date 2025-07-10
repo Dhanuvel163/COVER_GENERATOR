@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -7,16 +6,25 @@ import { ArrowRight, Eye, LogIn, User, FileText, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AuthModal from "@/components/AuthModal";
 import GlassBackground from "@/components/GlassBackground";
+import { useUserStore } from "@/store/userStore";
+import { toast } from "sonner";
 
 const Index = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
-  const [isLoggedIn] = useState(false);
+  const isLoggedIn = useUserStore((state) => state.isLoggedIn);
+  const clearUser = useUserStore((state) => state.clearUser);
   const navigate = useNavigate();
 
   const handleAuth = (mode: 'login' | 'signup') => {
     setAuthMode(mode);
     setShowAuthModal(true);
+  };
+
+  const logout = () => {
+    clearUser();
+    toast.success("Logged out successfully!");
+    navigate("/");
   };
 
   const features = [
@@ -57,15 +65,12 @@ const Index = () => {
   return (
     <div className="min-h-screen relative overflow-hidden">
       <GlassBackground />
-      
-      {/* Header */}
       <header className="relative z-10 px-6 py-4">
         <nav className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <div className="w-10 h-10 rounded-xl glass-red flex items-center justify-center">
               <span className="text-red-500 font-bold text-xl">C</span>
             </div>
-            {/* <img src='/logo1.jpeg'/> */}
             <span className="text-2xl font-bold bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
               Cover AI
             </span>
@@ -73,38 +78,28 @@ const Index = () => {
           
           {!isLoggedIn ? (
             <div className="flex items-center space-x-4">
-              {/* <Button 
-                variant="ghost" 
-                onClick={() => handleAuth('login')}
-                className="glass-button hover:glass-red"
-              >
-                <LogIn className="w-4 h-4 mr-2" />
-                Login
-              </Button> */}
-              <Button 
-                onClick={() => handleAuth('login')}
-                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button"
-              >
+              <Button onClick={() => handleAuth('login')}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button">
                 <User className="w-4 h-4 mr-2" />
                 Login
               </Button>
             </div>
           ) : (
             <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
-                onClick={() => navigate('/profile')}
-                className="glass-button hover:glass-red"
-              >
+              <Button variant="ghost" className="glass-button hover:glass-red"
+                onClick={() => navigate('/profile')}>
                 <User className="w-4 h-4 mr-2" />
                 Profile
               </Button>
-              <Button 
-                onClick={() => navigate('/generator')}
-                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button"
-              >
+              <Button onClick={() => navigate('/generator')}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button">
                 <FileText className="w-4 h-4 mr-2" />
                 Generate
+              </Button>
+              <Button variant="ghost" className="glass-button hover:glass-red hover:black" 
+                onClick={() => logout()}>
+                <LogIn className="w-4 h-4 mr-2" />
+                Logout
               </Button>
             </div>
           )}
@@ -132,14 +127,10 @@ const Index = () => {
           </p>
           
           {isLoggedIn ? (
-            // Quick Actions for logged-in users
             <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-16">
               {quickActions.map((action, index) => (
-                <Card 
-                  key={index}
-                  className="glass-card p-6 cursor-pointer hover:scale-105 transition-all duration-300"
-                  onClick={action.action}
-                >
+                <Card  key={index} onClick={action.action}
+                  className="glass-card p-6 cursor-pointer hover:scale-105 transition-all duration-300">
                   <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${action.color} mx-auto mb-4 flex items-center justify-center text-white`}>
                     {action.icon}
                   </div>
@@ -150,19 +141,13 @@ const Index = () => {
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-slide-in">
-              <Button 
-                size="lg"
-                onClick={() => handleAuth('signup')}
-                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-4 text-lg glass-button"
-              >
+              <Button size="lg" onClick={() => handleAuth('signup')}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-4 text-lg glass-button">
                 Get Started Free
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="glass-button hover:glass-red px-8 py-4 text-lg"
-              >
+              <Button size="lg" variant="outline"
+                className="glass-button hover:glass-red px-8 py-4 text-lg">
                 <Eye className="mr-2 w-5 h-5" />
                 See Demo
               </Button>
@@ -172,11 +157,8 @@ const Index = () => {
           {/* Features Grid */}
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {features.map((feature, index) => (
-              <Card 
-                key={index} 
-                className="glass-card p-6 text-center hover:glass-red transition-all duration-300 animate-fade-in"
-                style={{ animationDelay: `${index * 0.2}s` }}
-              >
+              <Card key={index} style={{ animationDelay: `${index * 0.2}s` }}
+                className="glass-card p-6 text-center hover:glass-red transition-all duration-300 animate-fade-in">
                 <div className="w-12 h-12 rounded-xl glass-red mx-auto mb-4 flex items-center justify-center text-red-500">
                   {feature.icon}
                 </div>
@@ -193,11 +175,7 @@ const Index = () => {
       <div className="absolute top-40 right-20 w-16 h-16 rounded-full glass animate-float opacity-40" style={{ animationDelay: '1s' }} />
       <div className="absolute bottom-20 left-1/4 w-12 h-12 rounded-full glass-red animate-float opacity-50" style={{ animationDelay: '2s' }} />
 
-      <AuthModal 
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        mode={authMode}
-      />
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} mode={authMode}/>
     </div>
   );
 };
