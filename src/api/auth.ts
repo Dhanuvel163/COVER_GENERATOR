@@ -9,5 +9,5 @@ export const googleAuthApi = async (data: {
   phone_number: string | null;
   photoURL: string | null;
 }) => {
-  return axios.post(`${BASE_URL}/api/auth/google`, data);
+  return axios.post(`${BASE_URL}/api/user/register`, data);
 };

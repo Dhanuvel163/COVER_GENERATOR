@@ -7,6 +7,9 @@ import { Separator } from "@/components/ui/separator";
 import { LogIn, User } from "lucide-react";
 import { auth, GoogleAuthProvider, signInWithPopup } from "@/firebase";
 import { googleAuthApi } from "@/api/auth";
+import { useUserStore } from "@/store/userStore";
+import { toast } from "sonner";
+import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -19,28 +22,54 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
   const [otp, setOtp] = useState('');
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate OTP sending
-    setTimeout(() => {
+    try {
+      if (!(window as any).recaptchaVerifier) {
+        (window as any).recaptchaVerifier = new RecaptchaVerifier(
+          auth, "recaptcha-container",
+          {
+            size: "invisible",
+            callback: () => {},
+          },
+        );
+      }
+      const appVerifier = (window as any).recaptchaVerifier;
+      const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+      setConfirmationResult(result);
       setShowOtpInput(true);
+      toast.success("OTP sent successfully!", { className: 'success-toast' });
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to send OTP", { className: 'error-toast' });
+      console.error(error);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate OTP verification
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      if (!confirmationResult) {
+        toast.error("No OTP request found. Please try again.", { className: 'error-toast' });
+        setIsLoading(false);
+        return;
+      }
+      const response = await confirmationResult.confirm(otp);
+      console.info({response});
+      toast.success("Phone authentication successful!", { className: 'success-toast' });
+      setShowOtpInput(false);
       onClose();
-      // Here you would handle successful authentication
-    }, 1000);
+    } catch (error: any) {
+      toast.error(error?.message || "Invalid OTP", { className: 'error-toast' });
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleAuth = async () => {
@@ -50,8 +79,7 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       const tokenId = await user.getIdToken();
-
-      await googleAuthApi({
+      const response = await googleAuthApi({
         idToken: tokenId,
         email: user.email,
         name: user.displayName,
@@ -59,11 +87,12 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
         phone_number: user.phoneNumber,
         photoURL: user.photoURL,
       });
-
+      useUserStore.getState().setUser(response.data);
+      toast.success("Google authentication successful!", { className: 'success-toast' });
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Google authentication error:", error);
-      // Optionally handle error UI here
+      toast.error(error?.message || "Google authentication failed.", { className: 'error-toast' });
     } finally {
       setIsLoading(false);
     }
@@ -72,20 +101,15 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="glass-card border-0 max-w-md">
+        <div id="recaptcha-container" /> {/* Recaptcha container */}
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">
             {mode === 'login' ? 'Welcome Back' : 'Create Account'}
           </DialogTitle>
         </DialogHeader>
-        
         <div className="space-y-6">
-          {/* Google Authentication */}
-          <Button
-            onClick={handleGoogleAuth}
-            variant="outline"
-            className="w-full glass-button hover:glass-red py-3"
-            disabled={isLoading}
-          >
+          <Button onClick={handleGoogleAuth} variant="outline"
+            className="w-full glass-button hover:glass-red py-3" disabled={isLoading}>
             {isLoading ? (
               <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
             ) : (
@@ -106,26 +130,21 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
             </span>
           </div>
 
-          {/* Phone Authentication */}
           {!showOtpInput ? (
             <form onSubmit={handlePhoneSubmit} className="space-y-4">
               <div>
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="+1 (555) 123-4567"
-                  value={phoneNumber}
+                  id="phone" type="tel"
+                  placeholder="+917231234567" value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="glass-input mt-1"
-                  required
+                  className="glass-input mt-1" required
                 />
+                <div id='recaptcha-container'></div>
               </div>
               <Button 
-                type="submit" 
                 className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button"
-                disabled={isLoading}
-              >
+                type="submit" disabled={isLoading}>
                 {isLoading ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                 ) : (
@@ -139,37 +158,27 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
               <div>
                 <Label htmlFor="otp">Enter OTP</Label>
                 <Input
-                  id="otp"
-                  type="text"
-                  placeholder="123456"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
+                  id="otp" type="text" placeholder="123456"
+                  value={otp} onChange={(e) => setOtp(e.target.value)}
                   className="glass-input mt-1 text-center text-lg tracking-widest"
-                  maxLength={6}
-                  required
-                />
+                  maxLength={6} required />
                 <p className="text-sm text-muted-foreground mt-1">
                   OTP sent to {phoneNumber}
                 </p>
               </div>
               <Button 
-                type="submit" 
-                className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                ) : (
-                  <User className="w-4 h-4 mr-2" />
-                )}
+                type="submit" disabled={isLoading}
+                className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button">
+                  {isLoading ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  ) : (
+                    <User className="w-4 h-4 mr-2" />
+                  )}
                 Verify & {mode === 'login' ? 'Login' : 'Sign Up'}
               </Button>
               <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setShowOtpInput(false)}
-                className="w-full glass-button"
-              >
+                type="button" variant="ghost" onClick={() => setShowOtpInput(false)}
+                className="w-full glass-button">
                 Back to Phone Number
               </Button>
             </form>

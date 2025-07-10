@@ -11,7 +11,7 @@ import GlassBackground from "@/components/GlassBackground";
 const Index = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
-  const [isLoggedIn] = useState(false); // This will be connected to actual auth state later
+  const [isLoggedIn] = useState(false);
   const navigate = useNavigate();
 
   const handleAuth = (mode: 'login' | 'signup') => {
@@ -73,20 +73,20 @@ const Index = () => {
           
           {!isLoggedIn ? (
             <div className="flex items-center space-x-4">
-              <Button 
+              {/* <Button 
                 variant="ghost" 
                 onClick={() => handleAuth('login')}
                 className="glass-button hover:glass-red"
               >
                 <LogIn className="w-4 h-4 mr-2" />
                 Login
-              </Button>
+              </Button> */}
               <Button 
-                onClick={() => handleAuth('signup')}
+                onClick={() => handleAuth('login')}
                 className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button"
               >
                 <User className="w-4 h-4 mr-2" />
-                Sign Up
+                Login
               </Button>
             </div>
           ) : (

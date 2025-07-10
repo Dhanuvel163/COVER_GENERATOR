@@ -126,3 +126,17 @@
     @apply glass rounded-lg px-4 py-3 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/50 transition-all duration-300;
   }
 }
+
+.success-toast{
+  color: #09bb4b;
+  /* border: 1px solid #09bb4b; */
+}
+
+.error-toast{
+  color: #ef4444;
+  /* border: 1px solid #ef4444; */
+}
+
+.grecaptcha-badge{
+  visibility: hidden !important;
+}
