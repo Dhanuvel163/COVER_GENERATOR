@@ -146,11 +146,6 @@ const Index = () => {
                 Get Started Free
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline"
-                className="glass-button hover:glass-red px-8 py-4 text-lg">
-                <Eye className="mr-2 w-5 h-5" />
-                See Demo
-              </Button>
             </div>
           )}
 
