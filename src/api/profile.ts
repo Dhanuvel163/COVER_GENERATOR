@@ -8,3 +8,11 @@ export const fetchUserProfile = async (token: string) => {
     },
   });
 };
+
+export const updateUserProfile = async (token: string, profileData: any) => {
+  return axios.put(`${BASE_URL}/api/user/profile`, profileData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
