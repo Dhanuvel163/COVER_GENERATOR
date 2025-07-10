@@ -10,6 +10,7 @@ import { googleAuthApi } from "@/api/auth";
 import { useUserStore } from "@/store/userStore";
 import { toast } from "sonner";
 import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const navigate = useNavigate();
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +66,7 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
       toast.success("Phone authentication successful!", { className: 'success-toast' });
       setShowOtpInput(false);
       onClose();
+      navigate('/profile');
     } catch (error: any) {
       toast.error(error?.message || "Invalid OTP", { className: 'error-toast' });
       console.error(error);
@@ -90,6 +93,7 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
       useUserStore.getState().setUser(response.data);
       toast.success("Google authentication successful!", { className: 'success-toast' });
       onClose();
+      navigate('/profile');
     } catch (error: any) {
       console.error("Google authentication error:", error);
       toast.error(error?.message || "Google authentication failed.", { className: 'error-toast' });
