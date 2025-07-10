@@ -13,6 +13,7 @@ const Index = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
+  const removeIsLoggedIn = useUserStore((state) => state.removeIsLoggedIn);
   const clearUser = useUserStore((state) => state.clearUser);
   const navigate = useNavigate();
 
@@ -22,7 +23,8 @@ const Index = () => {
   };
 
   const logout = () => {
-    clearUser();
+    removeIsLoggedIn();
+    clearUser()
     toast.success("Logged out successfully!");
     navigate("/");
   };

@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,6 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Upload, User, Save, FileText } from "lucide-react";
 import GlassBackground from "@/components/GlassBackground";
+import { fetchUserProfile } from "@/api/profile";
+import { useUserStore } from "@/store/userStore";
 
 const Profile = () => {
   const [profile, setProfile] = useState({
@@ -20,6 +21,32 @@ const Profile = () => {
     summary: ''
   });
   const [resume, setResume] = useState<File | null>(null);
+  const setUser = useUserStore((state) => state.setUser);
+  const token = useUserStore((state) => state?.token);
+
+  useEffect(() => {
+    const getProfile = async () => {
+      if (!token) return;
+      try {
+        const { data } = await fetchUserProfile(token);
+        const user = data.user || {};
+        setProfile({
+          fullName: user.name || '',
+          email: user.email || '',
+          phone: user.phoneNumber || '',
+          jobTitle: user.currentJobTitle || '',
+          experience: user.yearsOfExperience || '',
+          skills: user.keySkills?.join(", ") || '',
+          education: user.education || '',
+          summary: user.summary || ''
+        });
+        setUser(user);
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+      }
+    };
+    getProfile();
+  }, [token, setUser]);
 
   const handleInputChange = (field: string, value: string) => {
     setProfile(prev => ({ ...prev, [field]: value }));
@@ -78,6 +105,7 @@ const Profile = () => {
                     <Input
                       id="email"
                       type="email"
+                      disabled
                       value={profile.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
                       className="glass-input mt-1"
@@ -91,10 +119,11 @@ const Profile = () => {
                     <Label htmlFor="phone">Phone</Label>
                     <Input
                       id="phone"
+                      disabled
                       value={profile.phone}
                       onChange={(e) => handleInputChange('phone', e.target.value)}
                       className="glass-input mt-1"
-                      placeholder="+1 (555) 123-4567"
+                      placeholder="+918212345670"
                     />
                   </div>
                   <div>
@@ -113,10 +142,11 @@ const Profile = () => {
                   <Label htmlFor="experience">Years of Experience</Label>
                   <Input
                     id="experience"
+                    type='number'
                     value={profile.experience}
                     onChange={(e) => handleInputChange('experience', e.target.value)}
                     className="glass-input mt-1"
-                    placeholder="5 years"
+                    placeholder="5"
                   />
                 </div>
 
@@ -131,7 +161,7 @@ const Profile = () => {
                   />
                 </div>
 
-                <div>
+                {/* <div>
                   <Label htmlFor="education">Education</Label>
                   <Textarea
                     id="education"
@@ -140,9 +170,9 @@ const Profile = () => {
                     className="glass-input mt-1 min-h-[80px]"
                     placeholder="Bachelor's in Computer Science, XYZ University"
                   />
-                </div>
+                </div> */}
 
-                <div>
+                {/* <div>
                   <Label htmlFor="summary">Professional Summary</Label>
                   <Textarea
                     id="summary"
@@ -151,7 +181,7 @@ const Profile = () => {
                     className="glass-input mt-1 min-h-[120px]"
                     placeholder="Brief summary of your professional background and achievements..."
                   />
-                </div>
+                </div> */}
               </div>
             </Card>
 

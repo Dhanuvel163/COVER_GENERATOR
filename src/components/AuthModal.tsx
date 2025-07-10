@@ -61,8 +61,18 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
         setIsLoading(false);
         return;
       }
-      const response = await confirmationResult.confirm(otp);
-      console.info({response});
+      const result = await confirmationResult.confirm(otp);
+      const user = result.user;
+      const tokenId = await user.getIdToken();
+      const response = await googleAuthApi({
+        idToken: tokenId,
+        email: user.email,
+        name: user.displayName,
+        uid: user.uid,
+        phone_number: user.phoneNumber,
+        photoURL: user.photoURL,
+      });
+      useUserStore.getState().setIsLoggedIn(response.data?.token);
       toast.success("Phone authentication successful!", { className: 'success-toast' });
       setShowOtpInput(false);
       onClose();
@@ -90,7 +100,7 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
         phone_number: user.phoneNumber,
         photoURL: user.photoURL,
       });
-      useUserStore.getState().setUser(response.data);
+      useUserStore.getState().setIsLoggedIn(response.data?.token);
       toast.success("Google authentication successful!", { className: 'success-toast' });
       onClose();
       navigate('/profile');
