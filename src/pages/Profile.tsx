@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Upload, User, Save, FileText } from "lucide-react";
 import GlassBackground from "@/components/GlassBackground";
 import { fetchUserProfile } from "@/api/profile";
 import { updateUserProfile } from "@/api/profile";
+import { uploadUserResume } from "@/api/profile";
 import { useUserStore } from "@/store/userStore";
 import { toast } from "sonner";
 
@@ -17,6 +18,7 @@ const Profile = () => {
     experience: '', skills: '', education: '', summary: ''
   });
   const [resume, setResume] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const setUser = useUserStore((state) => state.setUser);
   const token = useUserStore((state) => state?.token);
 
@@ -48,10 +50,28 @@ const Profile = () => {
     setProfile(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleResumeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setResume(e.target.files[0]);
+      const file = e.target.files[0];
+      setResume(file);
+      if (!token) {
+        toast.error("You must be logged in to upload a resume.");
+        return;
+      }
+      try {
+        const formData = new FormData();
+        formData.append("resume", file);
+        await uploadUserResume(token, formData);
+        toast.success("Resume uploaded successfully!");
+      } catch (error) {
+        toast.error("Failed to upload resume.");
+        console.error("Resume upload error:", error);
+      }
     }
+  };
+
+  const handleResumeButtonClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleSave = async () => {
@@ -175,13 +195,17 @@ const Profile = () => {
                     Upload your resume (PDF, DOC, DOCX)
                   </p>
                   <input
-                    type="file" accept=".pdf,.doc,.docx" onChange={handleResumeUpload}
-                    className="hidden" id="resume-upload" />
-                  <Label htmlFor="resume-upload" className="cursor-pointer">
-                    <Button type="button" className="glass-button hover:glass-red">
-                      Choose File
-                    </Button>
-                  </Label>
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={handleResumeUpload}
+                    className="hidden"
+                    id="resume-upload"
+                    ref={fileInputRef}
+                  />
+                  <Button type="button" className="glass-button hover:glass-red"
+                    onClick={handleResumeButtonClick} >
+                    Choose File
+                  </Button>
                   {resume && (
                     <p className="text-sm text-green-600 mt-2">
                       ✓ {resume.name}
@@ -189,8 +213,7 @@ const Profile = () => {
                   )}
                 </div>
                 <Button onClick={handleSave}
-                  className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button"
-                >
+                  className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button">
                   <Save className="w-4 h-4 mr-2" />
                   Save Profile
                 </Button>

@@ -16,3 +16,12 @@ export const updateUserProfile = async (token: string, profileData: any) => {
     },
   });
 };
+
+export const uploadUserResume = async (token: string, formData: FormData) => {
+  return axios.post(`${BASE_URL}/api/user/upload-resume`, formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
