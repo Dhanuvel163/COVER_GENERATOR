@@ -2,31 +2,22 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Eye, LogIn, User, FileText, Sparkles } from "lucide-react";
+import { ArrowRight, Eye, User, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AuthModal from "@/components/AuthModal";
 import GlassBackground from "@/components/GlassBackground";
 import { useUserStore } from "@/store/userStore";
-import { toast } from "sonner";
+import Header from '@/components/Header';
 
 const Index = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
-  const removeIsLoggedIn = useUserStore((state) => state.removeIsLoggedIn);
-  const clearUser = useUserStore((state) => state.clearUser);
   const navigate = useNavigate();
 
   const handleAuth = (mode: 'login' | 'signup') => {
     setAuthMode(mode);
     setShowAuthModal(true);
-  };
-
-  const logout = () => {
-    removeIsLoggedIn();
-    clearUser()
-    toast.success("Logged out successfully!");
-    navigate("/");
   };
 
   const features = [
@@ -67,54 +58,12 @@ const Index = () => {
   return (
     <div className="min-h-screen relative overflow-hidden">
       <GlassBackground />
-      <header className="relative z-10 px-6 py-4">
-        <nav className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 rounded-xl glass-red flex items-center justify-center">
-              <span className="text-red-500 font-bold text-xl">C</span>
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
-              Cover AI
-            </span>
-          </div>
-          
-          {!isLoggedIn ? (
-            <div className="flex items-center space-x-4">
-              <Button onClick={() => handleAuth('login')}
-                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button">
-                <User className="w-4 h-4 mr-2" />
-                Login
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="glass-button hover:glass-red"
-                onClick={() => navigate('/profile')}>
-                <User className="w-4 h-4 mr-2" />
-                Profile
-              </Button>
-              <Button onClick={() => navigate('/generator')}
-                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button">
-                <FileText className="w-4 h-4 mr-2" />
-                Generate
-              </Button>
-              <Button variant="ghost" className="glass-button hover:glass-red hover:black" 
-                onClick={() => logout()}>
-                <LogIn className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
-            </div>
-          )}
-        </nav>
-      </header>
-
-      {/* Hero Section */}
+      <Header handleAuth={handleAuth}/>
       <main className="relative z-10 px-6 py-16">
         <div className="max-w-7xl mx-auto text-center">
           <Badge className="mb-6 glass-red text-red-500 border-red-500/30 animate-fade-in">
             ✨ AI-Powered Cover Letter Generator
           </Badge>
-          
           <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
             Craft Perfect
             <span className="block bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
@@ -122,12 +71,10 @@ const Index = () => {
             </span>
             in Seconds
           </h1>
-          
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-slide-in">
             Transform your job applications with AI-generated cover letters tailored to any job description. 
             Upload your profile, paste the JD, and let our AI create compelling cover letters that get you noticed.
           </p>
-          
           {isLoggedIn ? (
             <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-16">
               {quickActions.map((action, index) => (
@@ -166,12 +113,9 @@ const Index = () => {
           </div>
         </div>
       </main>
-
-      {/* Floating Elements */}
       <div className="absolute top-20 left-10 w-20 h-20 rounded-full glass-red animate-float opacity-60" />
       <div className="absolute top-40 right-20 w-16 h-16 rounded-full glass animate-float opacity-40" style={{ animationDelay: '1s' }} />
       <div className="absolute bottom-20 left-1/4 w-12 h-12 rounded-full glass-red animate-float opacity-50" style={{ animationDelay: '2s' }} />
-
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} mode={authMode}/>
     </div>
   );

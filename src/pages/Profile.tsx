@@ -11,6 +11,7 @@ import { updateUserProfile } from "@/api/profile";
 import { uploadUserResume } from "@/api/profile";
 import { useUserStore } from "@/store/userStore";
 import { toast } from "sonner";
+import Header from '@/components/Header';
 
 const Profile = () => {
   const [profile, setProfile] = useState({
@@ -97,6 +98,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen relative overflow-hidden">
       <GlassBackground />
+      <Header/>
       <div className="relative z-10 px-6 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
@@ -132,26 +134,19 @@ const Profile = () => {
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input
-                      id="phone" disabled value={profile.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      className="glass-input mt-1" placeholder="+918212345670" />
-                  </div>
-                  <div>
                     <Label htmlFor="jobTitle">Current Job Title</Label>
                     <Input
                       id="jobTitle" value={profile.jobTitle}
                       onChange={(e) => handleInputChange('jobTitle', e.target.value)}
                       className="glass-input mt-1" placeholder="Software Engineer" />
                   </div>
-                </div>
-                <div>
-                  <Label htmlFor="experience">Years of Experience</Label>
-                  <Input
-                    id="experience" type='number' value={profile.experience}
-                    onChange={(e) => handleInputChange('experience', e.target.value)}
-                    className="glass-input mt-1" placeholder="5" />
+                  <div>
+                    <Label htmlFor="experience">Years of Experience</Label>
+                    <Input
+                      id="experience" type='number' value={profile.experience}
+                      onChange={(e) => handleInputChange('experience', e.target.value)}
+                      className="glass-input mt-1" placeholder="5" />
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="skills">Key Skills</Label>
@@ -161,26 +156,11 @@ const Profile = () => {
                     className="glass-input mt-1 min-h-[100px]"
                     placeholder="React, Node.js, Python, MongoDB..." />
                 </div>
-                {/* <div>
-                  <Label htmlFor="education">Education</Label>
-                  <Textarea
-                    id="education"
-                    value={profile.education}
-                    onChange={(e) => handleInputChange('education', e.target.value)}
-                    className="glass-input mt-1 min-h-[80px]"
-                    placeholder="Bachelor's in Computer Science, XYZ University"
-                  />
-                </div> */}
-                {/* <div>
-                  <Label htmlFor="summary">Professional Summary</Label>
-                  <Textarea
-                    id="summary"
-                    value={profile.summary}
-                    onChange={(e) => handleInputChange('summary', e.target.value)}
-                    className="glass-input mt-1 min-h-[120px]"
-                    placeholder="Brief summary of your professional background and achievements..."
-                  />
-                </div> */}
+                <Button onClick={handleSave}
+                  className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button">
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Profile
+                </Button>
               </div>
             </Card>
             <Card className="glass-card p-6">
@@ -191,32 +171,18 @@ const Profile = () => {
               <div className="space-y-4">
                 <div className="border-2 border-dashed border-red-200 rounded-lg p-6 text-center glass-red">
                   <Upload className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Upload your resume (PDF, DOC, DOCX)
-                  </p>
+                  <p className="text-sm text-muted-foreground mb-4">Upload your resume (PDF, DOC, DOCX)</p>
                   <input
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    onChange={handleResumeUpload}
-                    className="hidden"
-                    id="resume-upload"
-                    ref={fileInputRef}
-                  />
+                    type="file" accept=".pdf,.doc,.docx" id="resume-upload" ref={fileInputRef}
+                    onChange={handleResumeUpload} className="hidden"/>
                   <Button type="button" className="glass-button hover:glass-red"
-                    onClick={handleResumeButtonClick} >
+                    onClick={handleResumeButtonClick}>
                     Choose File
                   </Button>
                   {resume && (
-                    <p className="text-sm text-green-600 mt-2">
-                      ✓ {resume.name}
-                    </p>
+                    <p className="text-sm text-green-600 mt-2">✓ {resume.name}</p>
                   )}
                 </div>
-                <Button onClick={handleSave}
-                  className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button">
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Profile
-                </Button>
               </div>
             </Card>
           </div>

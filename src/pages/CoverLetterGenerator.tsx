@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FileText, Sparkles, Copy, Download } from "lucide-react";
 import GlassBackground from "@/components/GlassBackground";
+import Header from '@/components/Header';
 
 const CoverLetterGenerator = () => {
   const [jobDescription, setJobDescription] = useState('');
@@ -59,7 +60,7 @@ Sincerely,
   return (
     <div className="min-h-screen relative overflow-hidden">
       <GlassBackground />
-      
+      <Header/>
       <div className="relative z-10 px-6 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}

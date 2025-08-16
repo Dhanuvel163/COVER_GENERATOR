@@ -137,7 +137,7 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
             Continue with Google
           </Button>
 
-          <div className="relative">
+          {/* <div className="relative">
             <Separator />
             <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-2 text-sm text-muted-foreground">
               or
@@ -196,7 +196,7 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
                 Back to Phone Number
               </Button>
             </form>
-          )}
+          )} */}
         </div>
       </DialogContent>
     </Dialog>
