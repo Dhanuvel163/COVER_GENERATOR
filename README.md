@@ -1,47 +1,76 @@
-# Welcome to cover generator project
+# COVER_GENERATOR
 
-## Project info
+A modern web application for generating cover letters, managing user profiles, and uploading resumes. Built with React, Zustand for state management, Firebase for authentication, and Axios for API communication.
 
-**URL**: https://lovable.dev/projects/60f17ab4-1e40-475d-93ce-18652bd08c88
+## Features
 
-## How can I edit this code?
+- **Authentication**
+  - Google and phone number login using Firebase
+  - OTP verification for phone authentication
+  - User session management with Zustand
 
-Follow these steps:
+- **Profile Management**
+  - Fetch and update user profile via secure API endpoints
+  - Upload resume files (PDF, DOC, DOCX) to the backend
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- **Cover Letter Generator**
+  - Generate personalized cover letters based on user profile and input
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- **Notifications**
+  - Success and error toasts using Sonner or Toaster
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Tech Stack
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+- React & TypeScript
+- Zustand (global state management)
+- Firebase (auth)
+- Axios (API calls)
+- React Query (data fetching/caching)
+- Sonner/Toaster (notifications)
+- Tailwind CSS (styling)
+
+## Folder Structure
+
+```
+src/
+  api/                # API calls (auth, user, profile, resume upload)
+  components/         # UI components (AuthModal, Header, etc.)
+  constants/          # App-wide constants (API base URL)
+  firebase.ts         # Firebase initialization
+  pages/              # Main pages (Index, Profile, CoverLetterGenerator)
+  store/              # Zustand stores (userStore)
 ```
 
-**Edit a file directly in GitHub**
+## Getting Started
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. **Install dependencies**
+   ```sh
+   npm install
+   ```
 
-**Use GitHub Codespaces**
+2. **Set up environment variables**
+   - Add your Firebase config and API base URL in `.env.local`:
+     ```
+     VITE_PUBLIC_FIREBASE_CONFIG=...
+     VITE_PUBLIC_BASE_URL=...
+     ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+3. **Run the app**
+   ```sh
+   npm run dev
+   ```
 
-## What technologies are used for this project?
+## API Endpoints
 
-This project is built with:
+- `POST /api/user/register` — Register/login user
+- `GET /api/user/profile` — Fetch user profile
+- `PUT /api/user/profile` — Update user profile
+- `POST /api/user/upload-resume` — Upload resume file
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Customization
+
+- Update Firebase config in `src/firebase.ts`
+- Change API base URL in `src/constants/api.ts`
+- Add more profile fields or cover letter templates as needed
+
+## License
