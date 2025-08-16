@@ -88,7 +88,7 @@ const Profile = () => {
       }else if (!profile.jobTitle?.trim()) {
         toast.error("Job title is mandatory.");
         return;
-      }else if (!profile.experience?.trim()) {
+      }else if (!profile.experience) {
         toast.error("Years of experience is mandatory.");
         return;
       }else if (!profile.skills?.trim()) {
