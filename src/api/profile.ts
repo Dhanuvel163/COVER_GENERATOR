@@ -25,3 +25,11 @@ export const uploadUserResume = async (token: string, formData: FormData) => {
     },
   });
 };
+
+export const generateCover = async (token: string, data) => {
+  return axios.post(`${BASE_URL}/api/user/generate-cover`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};

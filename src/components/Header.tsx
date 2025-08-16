@@ -27,7 +27,7 @@ const Header = ({handleAuth=(type)=>{}}) => {
             <div className="w-10 h-10 rounded-xl glass-red flex items-center justify-center">
               <span className="text-red-500 font-bold text-xl">C</span>
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent hidden md:block">
               Cover AI
             </span>
           </div>
@@ -43,18 +43,24 @@ const Header = ({handleAuth=(type)=>{}}) => {
             <div className="flex items-center space-x-4">
               <Button variant="ghost" className={(pathname=="/profile")?activeButtonClass:defaultButtonClass}
                 onClick={() => navigate('/profile')}>
-                <User className="w-4 h-4 mr-2" />
-                Profile
+                <User className="w-4 h-4 md:mr-2" />
+                <span className="hidden md:block">
+                  Profile
+                </span>
               </Button>
               <Button variant="ghost" className={(pathname=="/generator")?activeButtonClass:defaultButtonClass}
                 onClick={() => navigate('/generator')}>
-                <FileText className="w-4 h-4 mr-2" />
-                Generate
+                <FileText className="w-4 h-4 md:mr-2" />
+                <span className="hidden md:block">
+                  Generate
+                </span>
               </Button>
               <Button variant="ghost" className="glass-button hover:glass-red hover:text-black" 
                 onClick={() => logout()}>
-                <LogIn className="w-4 h-4 mr-2" />
-                Logout
+                <LogIn className="w-4 h-4 md:mr-2" />
+                <span className="hidden md:block">
+                  Logout
+                </span>
               </Button>
             </div>
           )}

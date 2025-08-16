@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,36 +8,39 @@ import { Input } from "@/components/ui/input";
 import { FileText, Sparkles, Copy, Download } from "lucide-react";
 import GlassBackground from "@/components/GlassBackground";
 import Header from '@/components/Header';
+import { generateCover } from "@/api/profile";
+import { toast } from "sonner";
+import { useUserStore } from '@/store/userStore';
 
 const CoverLetterGenerator = () => {
   const [jobDescription, setJobDescription] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [generatedLetter, setGeneratedLetter] = useState('');
+  const [maxCharacters, setMaxCharacters] = useState(1500);
   const [isGenerating, setIsGenerating] = useState(false);
+  const token = useUserStore((state) => state?.token);
+  const sectionRef = useRef(null);
 
   const handleGenerate = async () => {
-    if (!jobDescription.trim()) return;
-    
+    if (!jobDescription.trim()) {
+      toast.error("Job Description is mandatory.");
+      return;
+    }else if (!companyName.trim()) {
+      toast.error("Company Name is mandatory.");
+      return;
+    }else if (!jobTitle.trim()) {
+      toast.error("Job Title is mandatory.");
+      return;
+    }
     setIsGenerating(true);
-    
-    // Simulate AI generation - this will be replaced with actual AI call to Supabase Edge Function
-    setTimeout(() => {
-      const mockLetter = `Dear Hiring Manager,
-I am writing to express my strong interest in the ${jobTitle} position at ${companyName}. With my background in software engineering and passion for innovative technology solutions, I am excited about the opportunity to contribute to your team.
-
-Based on the job description you provided, I believe my skills in React, Node.js, and modern web development align perfectly with your requirements. My experience in building scalable applications and working with cross-functional teams has prepared me to make an immediate impact at ${companyName}.
-
-I am particularly drawn to ${companyName}'s commitment to innovation and would welcome the opportunity to discuss how my technical expertise and collaborative approach can contribute to your continued success.
-
-Thank you for considering my application. I look forward to hearing from you.
-
-Sincerely,
-[Your Name]`;
-      
-      setGeneratedLetter(mockLetter);
-      setIsGenerating(false);
-    }, 3000);
+    const response = await generateCover(token,{jobDescription,companyName,jobTitle,maxCharacters})
+    setGeneratedLetter(response.data?.coverLetter);
+    setIsGenerating(false);
+    sectionRef.current?.scrollIntoView({ 
+      behavior: "smooth",
+      block: "start"
+    });
   };
 
   const handleCopy = () => {
@@ -45,11 +48,11 @@ Sincerely,
   };
 
   const handleDownload = () => {
-    const blob = new Blob([generatedLetter], { type: 'text/plain' });
+    const blob = new Blob([generatedLetter], { type: 'application/docx' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `cover-letter-${companyName || 'job'}.txt`;
+    a.download = `cover-letter-${companyName || 'job'}.docx`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -60,10 +63,10 @@ Sincerely,
     <div className="min-h-screen relative overflow-hidden">
       <GlassBackground />
       <Header/>
-      <div className="relative z-10 px-6 py-8">
+      <div className="relative z-10 px-4 md:px-6 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold mb-2 bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
               AI Cover Letter Generator
             </h1>
             <p className="text-muted-foreground">
@@ -71,10 +74,10 @@ Sincerely,
             </p>
           </div>
           <div className="grid lg:grid-cols-2 gap-8">
-            <Card className="glass-card p-6">
+            <Card className="glass-card p-4 md:p-6">
               <div className="flex items-center mb-6">
                 <FileText className="w-6 h-6 text-red-500 mr-2" />
-                <h2 className="text-2xl font-semibold">Job Details</h2>
+                <h2 className="text-md md:text-2xl font-semibold">Job Details</h2>
               </div>
               <div className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
@@ -89,6 +92,14 @@ Sincerely,
                     <Input
                       id="jobTitle" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)}
                       className="glass-input mt-1" placeholder="Software Engineer"/>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-1 gap-4">
+                  <div>
+                    <Label htmlFor="maxCharacters">Max Characters</Label>
+                    <Input type='number'
+                      id="maxCharacters" value={maxCharacters} onChange={(e) => setMaxCharacters(parseInt(e.target.value))}
+                      className="glass-input mt-1" placeholder="1500"/>
                   </div>
                 </div>
                 <div>
@@ -112,13 +123,11 @@ Sincerely,
                 </Button>
               </div>
             </Card>
-
-            {/* Output Section */}
-            <Card className="glass-card p-6">
+            <Card className="glass-card p-4 md:p-6" ref={sectionRef}>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center">
                   <Sparkles className="w-6 h-6 text-red-500 mr-2" />
-                  <h2 className="text-2xl font-semibold">Generated Cover Letter</h2>
+                  <h2 className="text-md md:text-2xl font-semibold">Generated Cover Letter</h2>
                 </div>
                 {generatedLetter && (
                   <div className="flex space-x-2">

@@ -19,31 +19,34 @@ const Profile = () => {
     experience: '', skills: '', education: '', summary: ''
   });
   const [resume, setResume] = useState<File | null>(null);
+  const [resumeUrl, setResumeUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const setUser = useUserStore((state) => state.setUser);
   const token = useUserStore((state) => state?.token);
 
+  const getProfile = async () => {
+    if (!token) return;
+    try {
+      const { data } = await fetchUserProfile(token);
+      const user = data.user || {};
+      setProfile({
+        fullName: user.name || '',
+        email: user.email || '',
+        phone: user.phoneNumber || '',
+        jobTitle: user.currentJobTitle || '',
+        experience: user.yearsOfExperience || '',
+        skills: user.keySkills?.join(", ") || '',
+        education: user.education?.join(", ") || '',
+        summary: user.summary || ''
+      });
+      setResumeUrl(user.resumeUrl)
+      setUser(user);
+    } catch (error) {
+      console.error("Failed to fetch user profile:", error);
+    }
+  };
+
   useEffect(() => {
-    const getProfile = async () => {
-      if (!token) return;
-      try {
-        const { data } = await fetchUserProfile(token);
-        const user = data.user || {};
-        setProfile({
-          fullName: user.name || '',
-          email: user.email || '',
-          phone: user.phoneNumber || '',
-          jobTitle: user.currentJobTitle || '',
-          experience: user.yearsOfExperience || '',
-          skills: user.keySkills?.join(", ") || '',
-          education: user.education?.join(", ") || '',
-          summary: user.summary || ''
-        });
-        setUser(user);
-      } catch (error) {
-        console.error("Failed to fetch user profile:", error);
-      }
-    };
     getProfile();
   }, [token, setUser]);
 
@@ -64,6 +67,7 @@ const Profile = () => {
         formData.append("resume", file);
         await uploadUserResume(token, formData);
         toast.success("Resume uploaded successfully!");
+        await getProfile()
       } catch (error) {
         toast.error("Failed to upload resume.");
         console.error("Resume upload error:", error);
@@ -78,6 +82,19 @@ const Profile = () => {
   const handleSave = async () => {
     if (!token) return;
     try {
+      if (!profile.fullName?.trim()) {
+        toast.error("Name is mandatory.");
+        return;
+      }else if (!profile.jobTitle?.trim()) {
+        toast.error("Job title is mandatory.");
+        return;
+      }else if (!profile.experience?.trim()) {
+        toast.error("Years of experience is mandatory.");
+        return;
+      }else if (!profile.skills?.trim()) {
+        toast.error("Skills is mandatory.");
+        return;
+      }
       console.info("Saving profile with data:", profile);
       const payload = {
         name: profile.fullName,
@@ -99,10 +116,10 @@ const Profile = () => {
     <div className="min-h-screen relative overflow-hidden">
       <GlassBackground />
       <Header/>
-      <div className="relative z-10 px-6 py-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="relative z-10 px-4 md:px-6 py-8">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold mb-2 bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
               Professional Profile
             </h1>
             <p className="text-muted-foreground">
@@ -110,10 +127,10 @@ const Profile = () => {
             </p>
           </div>
           <div className="grid lg:grid-cols-3 gap-8">
-            <Card className="glass-card p-6 lg:col-span-2">
+            <Card className="glass-card p-4 md:p-6 lg:col-span-2">
               <div className="flex items-center mb-6">
                 <User className="w-6 h-6 text-red-500 mr-2" />
-                <h2 className="text-2xl font-semibold">Personal Information</h2>
+                <h2 className="text-md md:text-2xl font-semibold">Personal Information</h2>
               </div>
               <div className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
@@ -163,10 +180,10 @@ const Profile = () => {
                 </Button>
               </div>
             </Card>
-            <Card className="glass-card p-6">
+            <Card className="glass-card p-4 md:p-6">
               <div className="flex items-center mb-6">
                 <FileText className="w-6 h-6 text-red-500 mr-2" />
-                <h2 className="text-xl font-semibold">Resume</h2>
+                <h2 className="text-md md:text-2xl font-semibold">Resume</h2>
               </div>
               <div className="space-y-4">
                 <div className="border-2 border-dashed border-red-200 rounded-lg p-6 text-center glass-red">
@@ -179,8 +196,12 @@ const Profile = () => {
                     onClick={handleResumeButtonClick}>
                     Choose File
                   </Button>
-                  {resume && (
-                    <p className="text-sm text-green-600 mt-2">✓ {resume.name}</p>
+                  {resumeUrl && (
+                    <div className='max-w-[200px] md:max-w-none mx-auto'>
+                      <a href={resumeUrl} target='_blank'>
+                        <p className="text-sm text-green-600 mt-2 break-words cursor-pointer underline">✓ {resumeUrl?.split("/").pop()}</p>
+                      </a>
+                    </div>
                   )}
                 </div>
               </div>

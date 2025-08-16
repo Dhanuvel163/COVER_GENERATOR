@@ -59,19 +59,19 @@ const Index = () => {
     <div className="min-h-screen relative overflow-hidden">
       <GlassBackground />
       <Header handleAuth={handleAuth}/>
-      <main className="relative z-10 px-6 py-16">
+      <main className="relative z-10 px-6 py-6 md:py-16">
         <div className="max-w-7xl mx-auto text-center">
-          <Badge className="mb-6 glass-red text-red-500 border-red-500/30 animate-fade-in">
+          <Badge className="text-[9px] md:text-xs mb-6 glass-red text-red-500 border-red-500/30 animate-fade-in hover:text-white">
             ✨ AI-Powered Cover Letter Generator
           </Badge>
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
+          <h1 className="text-3xl md:text-6xl font-bold mb-6 animate-fade-in">
             Craft Perfect
             <span className="block bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
               Cover Letters
             </span>
             in Seconds
           </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-slide-in">
+          <p className="text-sm md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-slide-in">
             Transform your job applications with AI-generated cover letters tailored to any job description. 
             Upload your profile, paste the JD, and let our AI create compelling cover letters that get you noticed.
           </p>
@@ -97,8 +97,7 @@ const Index = () => {
               </Button>
             </div>
           )}
-
-          {/* Features Grid */}
+          <hr className='mb-16'/>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {features.map((feature, index) => (
               <Card key={index} style={{ animationDelay: `${index * 0.2}s` }}
