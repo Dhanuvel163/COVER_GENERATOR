@@ -12,6 +12,7 @@ import { uploadUserResume } from "@/api/profile";
 import { useUserStore } from "@/store/userStore";
 import { toast } from "sonner";
 import Header from '@/components/Header';
+import { errorStyle, successStyle } from '@/lib/toastStyles';
 
 const Profile = () => {
   const [profile, setProfile] = useState({
@@ -59,17 +60,17 @@ const Profile = () => {
       const file = e.target.files[0];
       setResume(file);
       if (!token) {
-        toast.error("You must be logged in to upload a resume.");
+        toast.error("You must be logged in to upload a resume.",errorStyle);
         return;
       }
       try {
         const formData = new FormData();
         formData.append("resume", file);
         await uploadUserResume(token, formData);
-        toast.success("Resume uploaded successfully!");
+        toast.success("Resume uploaded successfully!",successStyle);
         await getProfile()
       } catch (error) {
-        toast.error("Failed to upload resume.");
+        toast.error("Failed to upload resume.",errorStyle);
         console.error("Resume upload error:", error);
       }
     }
@@ -83,16 +84,16 @@ const Profile = () => {
     if (!token) return;
     try {
       if (!profile.fullName?.trim()) {
-        toast.error("Name is mandatory.");
+        toast.error("Name is mandatory.",errorStyle);
         return;
       }else if (!profile.jobTitle?.trim()) {
-        toast.error("Job title is mandatory.");
+        toast.error("Job title is mandatory.",errorStyle);
         return;
       }else if (!profile.experience) {
-        toast.error("Years of experience is mandatory.");
+        toast.error("Years of experience is mandatory.",errorStyle);
         return;
       }else if (!profile.skills?.trim()) {
-        toast.error("Skills is mandatory.");
+        toast.error("Skills is mandatory.",errorStyle);
         return;
       }
       console.info("Saving profile with data:", profile);
@@ -105,9 +106,9 @@ const Profile = () => {
         summary: profile.summary,
       };
       await updateUserProfile(token, payload);
-      toast.success("Profile updated successfully!");
+      toast.success("Profile updated successfully!",successStyle);
     } catch (error) {
-      toast.error("Failed to update profile.");
+      toast.error("Failed to update profile.",errorStyle);
       console.error("Failed to update profile:", error);
     }
   };

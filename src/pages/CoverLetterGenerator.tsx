@@ -11,6 +11,7 @@ import Header from '@/components/Header';
 import { generateCover } from "@/api/profile";
 import { toast } from "sonner";
 import { useUserStore } from '@/store/userStore';
+import { errorStyle } from '@/lib/toastStyles'
 
 const CoverLetterGenerator = () => {
   const [jobDescription, setJobDescription] = useState('');
@@ -24,13 +25,13 @@ const CoverLetterGenerator = () => {
 
   const handleGenerate = async () => {
     if (!jobDescription.trim()) {
-      toast.error("Job Description is mandatory.");
+      toast.error("Job Description is mandatory.",errorStyle);
       return;
     }else if (!companyName.trim()) {
-      toast.error("Company Name is mandatory.");
+      toast.error("Company Name is mandatory.",errorStyle);
       return;
     }else if (!jobTitle.trim()) {
-      toast.error("Job Title is mandatory.");
+      toast.error("Job Title is mandatory.",errorStyle);
       return;
     }
     setIsGenerating(true);

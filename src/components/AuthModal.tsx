@@ -11,6 +11,7 @@ import { useUserStore } from "@/store/userStore";
 import { toast } from "sonner";
 import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { errorStyle, successStyle } from '@/lib/toastStyles';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -43,9 +44,9 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
       const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
       setConfirmationResult(result);
       setShowOtpInput(true);
-      toast.success("OTP sent successfully!", { className: 'success-toast' });
+      toast.success("OTP sent successfully!",successStyle);
     } catch (error: any) {
-      toast.error(error?.message || "Failed to send OTP", { className: 'error-toast' });
+      toast.error(error?.message || "Failed to send OTP",errorStyle);
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -57,7 +58,7 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
     setIsLoading(true);
     try {
       if (!confirmationResult) {
-        toast.error("No OTP request found. Please try again.", { className: 'error-toast' });
+        toast.error("No OTP request found. Please try again.",errorStyle);
         setIsLoading(false);
         return;
       }
@@ -73,12 +74,12 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
         photoURL: user.photoURL,
       });
       useUserStore.getState().setIsLoggedIn(response.data?.token);
-      toast.success("Phone authentication successful!", { className: 'success-toast' });
+      toast.success("Phone authentication successful!",successStyle);
       setShowOtpInput(false);
       onClose();
       navigate('/profile');
     } catch (error: any) {
-      toast.error(error?.message || "Invalid OTP", { className: 'error-toast' });
+      toast.error(error?.message || "Invalid OTP",errorStyle);
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -101,12 +102,12 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
         photoURL: user.photoURL,
       });
       useUserStore.getState().setIsLoggedIn(response.data?.token);
-      toast.success("Google authentication successful!", { className: 'success-toast' });
+      toast.success("Google authentication successful!",successStyle);
       onClose();
       navigate('/profile');
     } catch (error: any) {
       console.error("Google authentication error:", error);
-      toast.error(error?.message || "Google authentication failed.", { className: 'error-toast' });
+      toast.error(error?.message || "Google authentication failed.",errorStyle);
     } finally {
       setIsLoading(false);
     }

@@ -4,6 +4,7 @@ import { LogIn, User, FileText } from "lucide-react";
 import { useNavigate,  } from "react-router-dom";
 import { toast } from "sonner";
 import { useLocation } from 'react-router-dom';
+import { successStyle } from "@/lib/toastStyles";
 
 const Header = ({handleAuth=(type)=>{}}) => {
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
@@ -15,7 +16,7 @@ const Header = ({handleAuth=(type)=>{}}) => {
   const logout = () => {
     removeIsLoggedIn();
     clearUser()
-    toast.success("Logged out successfully!");
+    toast.success("Logged out successfully!",successStyle);
     navigate("/");
   };
   const defaultButtonClass = "glass-button hover:glass-red hover:text-black"
