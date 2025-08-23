@@ -70,8 +70,12 @@ const Profile = () => {
         toast.success("Resume uploaded successfully!",successStyle);
         await getProfile()
       } catch (error) {
-        toast.error("Failed to upload resume.",errorStyle);
         console.error("Resume upload error:", error);
+        if(error?.response?.data?.show_message){
+          toast.error(error?.response?.data?.message,errorStyle);
+        }else{
+          toast.error("Failed to upload resume.",errorStyle);
+        }
       }
     }
   };
@@ -108,8 +112,12 @@ const Profile = () => {
       await updateUserProfile(token, payload);
       toast.success("Profile updated successfully!",successStyle);
     } catch (error) {
-      toast.error("Failed to update profile.",errorStyle);
       console.error("Failed to update profile:", error);
+      if(error?.response?.data?.show_message){
+        toast.error(error?.response?.data?.message,errorStyle);
+      }else{
+        toast.error("Failed to update profile.",errorStyle);
+      }
     }
   };
 

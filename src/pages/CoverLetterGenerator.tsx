@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Sparkles, Copy, Download, Link, Linkedin, Globe } from "lucide-react";
 import GlassBackground from "@/components/GlassBackground";
 import Header from '@/components/Header';
-import { generateCover } from "@/api/profile";
+import { generateCover, parseJD } from "@/api/profile";
 import { toast } from "sonner";
 import { useUserStore } from '@/store/userStore';
 import { errorStyle, successStyle } from '@/lib/toastStyles';
@@ -50,98 +50,82 @@ const CoverLetterGenerator = () => {
       toast.error("Please enter a job URL.", errorStyle);
       return;
     }
-
+    if(!/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(jobUrl)){
+      toast.error("Please enter a valid job URL.", errorStyle);
+      return;
+    }
     setIsParsing(true);
     try {
-      // Mock parsing logic - in real implementation, you'd call an API
-      // For now, we'll simulate parsing based on URL patterns
       const url = new URL(jobUrl);
-      const domain = url.hostname.toLowerCase();
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock parsed data based on domain
-      if (domain.includes('linkedin')) {
-        setCompanyName('LinkedIn Company');
-        setJobTitle('Software Engineer');
-        setJobDescription('We are looking for a talented Software Engineer to join our team...');
-      } else if (domain.includes('naukri')) {
-        setCompanyName('Naukri Company');
-        setJobTitle('Full Stack Developer');
-        setJobDescription('Join our dynamic team as a Full Stack Developer...');
-      } else {
-        setCompanyName('Tech Company');
-        setJobTitle('Developer');
-        setJobDescription('Exciting opportunity for a developer...');
-      }
-      
+      let response = await parseJD(token, {url});
+      if(response?.data?.response?.company) setCompanyName(response?.data?.response?.company)
+      if(response?.data?.response?.title) setJobTitle(response?.data?.response?.title)
+      if(response?.data?.response?.jobDescription) setJobDescription(response?.data?.response?.jobDescription)
       toast.success("Job details parsed successfully!", successStyle);
     } catch (error) {
-      toast.error("Failed to parse job URL. Please check the URL format.", errorStyle);
+      if(error?.response?.data?.message?.toLowerCase()=="invalid token"){
+        toast.error("Session Expired",errorStyle);
+        logout()
+      }else if(error?.response?.data?.show_message){
+        toast.error(error?.response?.data?.message,errorStyle);
+      } else toast.error("Failed to parse job URL. Please check the URL format.",errorStyle);
     } finally {
       setIsParsing(false);
     }
   };
 
   const handleGenerate = async () => {
-    try{
-      if (activeTab === 'cover-letter') {
-        if (!jobDescription.trim()) {
-          toast.error("Job Description is mandatory.", errorStyle);
-          return;
-        } else if (!companyName.trim()) {
-          toast.error("Company Name is mandatory.", errorStyle);
-          return;
-        } else if (!jobTitle.trim()) {
-          toast.error("Job Title is mandatory.", errorStyle);
-          return;
-        }
-        
-        setIsGenerating(true);
-        try {
-          const response = await generateCover(token, {
-            jobDescription,
-            companyName,
-            jobTitle,
-            maxCharacters
-          });
-          setGeneratedLetter(response.data?.coverLetter);
-        } catch (error) {
-          toast.error("Failed to generate cover letter.", errorStyle);
-        } finally {
-          setIsGenerating(false);
-        }
-      } else {
-        if (!customQuestions.trim()) {
-          toast.error("Custom Questions are mandatory.", errorStyle);
-          return;
-        }
-        
-        setIsGenerating(true);
-        try {
-          // Mock API call for custom questions
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          setGeneratedAnswers("Here are the generated answers to your custom questions...\n\n1. Answer to first question...\n\n2. Answer to second question...");
-          toast.success("Custom answers generated successfully!", successStyle);
-        } catch (error) {
-          toast.error("Failed to generate answers.", errorStyle);
-        } finally {
-          setIsGenerating(false);
-        }
+    if (activeTab === 'cover-letter') {
+      if (!jobDescription.trim()) {
+        toast.error("Job Description is mandatory.", errorStyle);
+        return;
+      } else if (!companyName.trim()) {
+        toast.error("Company Name is mandatory.", errorStyle);
+        return;
+      } else if (!jobTitle.trim()) {
+        toast.error("Job Title is mandatory.", errorStyle);
+        return;
       }
-      sectionRef.current?.scrollIntoView({ 
-        behavior: "smooth",
-        block: "start"
-      });
-    } catch (error) {
-      if(error?.response?.data?.message?.toLowerCase()=="invalid token"){
-        toast.error("Session Expired",errorStyle);
-        logout()
-      }else toast.error("Something went wrong, Please try again later",errorStyle);
-    }finally{
-      setIsGenerating(false);
+      setIsGenerating(true);
+      try {
+        const response = await generateCover(token, {
+          jobDescription,
+          companyName,
+          jobTitle,
+          maxCharacters
+        });
+        setGeneratedLetter(response.data?.coverLetter);
+      } catch (error) {
+        if(error?.response?.data?.message?.toLowerCase()=="invalid token"){
+          toast.error("Session Expired",errorStyle);
+          logout()
+        }else if(error?.response?.data?.show_message){
+          toast.error(error?.response?.data?.message,errorStyle);
+        } else toast.error("Failed to parse job URL. Please check the URL format.",errorStyle);
+      } finally {
+        setIsGenerating(false);
+      }
+    } else {
+      if (!customQuestions.trim()) {
+        toast.error("Custom Questions are mandatory.", errorStyle);
+        return;
+      }
+      setIsGenerating(true);
+      try {
+        // Mock API call for custom questions
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        setGeneratedAnswers("Here are the generated answers to your custom questions...\n\n1. Answer to first question...\n\n2. Answer to second question...");
+        toast.success("Custom answers generated successfully!", successStyle);
+      } catch (error) {
+        toast.error("Failed to generate answers.", errorStyle);
+      } finally {
+        setIsGenerating(false);
+      }
     }
+    sectionRef.current?.scrollIntoView({ 
+      behavior: "smooth",
+      block: "start"
+    });
   };
 
   const handleCopy = () => {
@@ -153,10 +137,10 @@ const CoverLetterGenerator = () => {
   const handleDownload = () => {
     const content = activeTab === 'cover-letter' ? generatedLetter : generatedAnswers;
     const filename = activeTab === 'cover-letter' 
-      ? `cover-letter-${companyName || 'job'}.txt`
-      : `custom-answers-${companyName || 'job'}.txt`;
+      ? `cover-letter-${companyName || 'job'}.docx`
+      : `custom-answers-${companyName || 'job'}.docx`;
     
-    const blob = new Blob([content], { type: 'text/plain' });
+    const blob = new Blob([content], { type: 'application/docx' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -221,7 +205,7 @@ const CoverLetterGenerator = () => {
                         )}
                       </Button>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                       <span>Supported sites:</span>
                       {supportedSites.map((site, index) => (
                         <div key={index} className="flex items-center gap-1">
