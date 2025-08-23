@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Sparkles, Copy, Download, Link, Linkedin, Globe } from "lucide-react";
 import GlassBackground from "@/components/GlassBackground";
 import Header from '@/components/Header';
-import { generateCover, parseJD } from "@/api/profile";
+import { generateCover, generateCustomAnswers, parseJD } from "@/api/profile";
 import { toast } from "sonner";
 import { useUserStore } from '@/store/userStore';
 import { errorStyle, successStyle } from '@/lib/toastStyles';
@@ -20,12 +20,21 @@ const CoverLetterGenerator = () => {
   const [companyName, setCompanyName] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [jobUrl, setJobUrl] = useState('');
+  
+  // Custom Questions tab - same fields as cover letter
+  const [customJobDescription, setCustomJobDescription] = useState('');
+  const [customCompanyName, setCustomCompanyName] = useState('');
+  const [customJobTitle, setCustomJobTitle] = useState('');
+  const [customJobUrl, setCustomJobUrl] = useState('');
+  const [customMaxCharacters, setCustomMaxCharacters] = useState(1500);
   const [customQuestions, setCustomQuestions] = useState('');
+  
   const [generatedLetter, setGeneratedLetter] = useState('');
   const [generatedAnswers, setGeneratedAnswers] = useState('');
   const [maxCharacters, setMaxCharacters] = useState(1500);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
+  const [isParsingCustom, setIsParsingCustom] = useState(false);
   const token = useUserStore((state) => state?.token);
   const sectionRef = useRef(null);
   const removeIsLoggedIn = useUserStore((state) => state.removeIsLoggedIn);
@@ -45,22 +54,36 @@ const CoverLetterGenerator = () => {
     { name: 'Glassdoor', icon: Globe, domain: 'glassdoor.com' }
   ];
 
-  const parseJobUrl = async () => {
-    if (!jobUrl.trim()) {
+  const parseJobUrl = async (isCustomTab = false) => {
+    const url = isCustomTab ? customJobUrl : jobUrl;
+    if (!url.trim()) {
       toast.error("Please enter a job URL.", errorStyle);
       return;
     }
-    if(!/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(jobUrl)){
+    if(!/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(url)){
       toast.error("Please enter a valid job URL.", errorStyle);
       return;
     }
-    setIsParsing(true);
+    
+    if (isCustomTab) {
+      setIsParsingCustom(true);
+    } else {
+      setIsParsing(true);
+    }
+    
     try {
-      const url = new URL(jobUrl);
-      let response = await parseJD(token, {url});
-      if(response?.data?.response?.company) setCompanyName(response?.data?.response?.company)
-      if(response?.data?.response?.title) setJobTitle(response?.data?.response?.title)
-      if(response?.data?.response?.jobDescription) setJobDescription(response?.data?.response?.jobDescription)
+      const parsedUrl = new URL(url);
+      let response = await parseJD(token, {url: parsedUrl});
+      
+      if (isCustomTab) {
+        if(response?.data?.response?.company) setCustomCompanyName(response?.data?.response?.company)
+        if(response?.data?.response?.title) setCustomJobTitle(response?.data?.response?.title)
+        if(response?.data?.response?.jobDescription) setCustomJobDescription(response?.data?.response?.jobDescription)
+      } else {
+        if(response?.data?.response?.company) setCompanyName(response?.data?.response?.company)
+        if(response?.data?.response?.title) setJobTitle(response?.data?.response?.title)
+        if(response?.data?.response?.jobDescription) setJobDescription(response?.data?.response?.jobDescription)
+      }
       toast.success("Job details parsed successfully!", successStyle);
     } catch (error) {
       if(error?.response?.data?.message?.toLowerCase()=="invalid token"){
@@ -70,7 +93,11 @@ const CoverLetterGenerator = () => {
         toast.error(error?.response?.data?.message,errorStyle);
       } else toast.error("Failed to parse job URL. Please check the URL format.",errorStyle);
     } finally {
-      setIsParsing(false);
+      if (isCustomTab) {
+        setIsParsingCustom(false);
+      } else {
+        setIsParsing(false);
+      }
     }
   };
 
@@ -106,18 +133,43 @@ const CoverLetterGenerator = () => {
         setIsGenerating(false);
       }
     } else {
+      if (!customJobDescription.trim()) {
+        toast.error("Job Description is mandatory.", errorStyle);
+        return;
+      } else if (!customCompanyName.trim()) {
+        toast.error("Company Name is mandatory.", errorStyle);
+        return;
+      } else if (!customJobTitle.trim()) {
+        toast.error("Job Title is mandatory.", errorStyle);
+        return;
+      } else if (!customQuestions.trim()) {
+        toast.error("Custom Questions are mandatory.", errorStyle);
+        return;
+      }
+      
       if (!customQuestions.trim()) {
         toast.error("Custom Questions are mandatory.", errorStyle);
         return;
       }
       setIsGenerating(true);
       try {
-        // Mock API call for custom questions
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        setGeneratedAnswers("Here are the generated answers to your custom questions...\n\n1. Answer to first question...\n\n2. Answer to second question...");
-        toast.success("Custom answers generated successfully!", successStyle);
+        const response = await generateCustomAnswers(token, {
+          jobDescription: customJobDescription,
+          companyName: customCompanyName,
+          jobTitle: customJobTitle,
+          customQuestions,
+          maxCharacters: customMaxCharacters
+        });
+        setGeneratedAnswers(response.data?.answers || "Generated answers will appear here...");
       } catch (error) {
-        toast.error("Failed to generate answers.", errorStyle);
+        if(error?.response?.data?.message?.toLowerCase()=="invalid token"){
+          toast.error("Session Expired",errorStyle);
+          logout()
+        }else if(error?.response?.data?.show_message){
+          toast.error(error?.response?.data?.message,errorStyle);
+        } else {
+          toast.error("Failed to generate answers.", errorStyle);
+        }
       } finally {
         setIsGenerating(false);
       }
@@ -167,21 +219,31 @@ const CoverLetterGenerator = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8">
-              <TabsTrigger value="cover-letter">Cover Letter</TabsTrigger>
-              <TabsTrigger value="custom-questions">Custom Questions</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-8 glass-card">
+              <TabsTrigger 
+                value="cover-letter" 
+                className="transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-red-600 data-[state=active]:text-white"
+              >
+                Cover Letter
+              </TabsTrigger>
+              <TabsTrigger 
+                value="custom-questions"
+                className="transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-red-600 data-[state=active]:text-white"
+              >
+                Custom Questions
+              </TabsTrigger>
             </TabsList>
 
             <div className="grid lg:grid-cols-2 gap-8">
-              <Card className="glass-card p-4 md:p-6">
-                <TabsContent value="cover-letter" className="mt-0">
+              <Card className="glass-card p-4 md:p-6 transition-all duration-500 ease-in-out">
+                <TabsContent value="cover-letter" className="mt-0 animate-fade-in">
                   <div className="flex items-center mb-6">
                     <FileText className="w-6 h-6 text-red-500 mr-2" />
                     <h2 className="text-md md:text-2xl font-semibold">Job Details</h2>
                   </div>
                   
                   {/* Auto Parse Section */}
-                  <div className="mb-6 p-4 glass-red rounded-lg">
+                  <div className="mb-6 p-4 glass-red rounded-lg transform transition-all duration-300 hover:scale-[1.02]">
                     <div className="flex items-center mb-3">
                       <Link className="w-5 h-5 text-red-500 mr-2" />
                       <h3 className="font-medium">Auto Parse Job Details</h3>
@@ -194,7 +256,7 @@ const CoverLetterGenerator = () => {
                         placeholder="Paste job URL here..."
                       />
                       <Button
-                        onClick={parseJobUrl}
+                        onClick={() => parseJobUrl(false)}
                         disabled={isParsing}
                         className="glass-button hover:glass-red"
                       >
@@ -263,19 +325,99 @@ const CoverLetterGenerator = () => {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="custom-questions" className="mt-0">
+                <TabsContent value="custom-questions" className="mt-0 animate-fade-in">
                   <div className="flex items-center mb-6">
                     <Sparkles className="w-6 h-6 text-red-500 mr-2" />
                     <h2 className="text-md md:text-2xl font-semibold">Custom Questions</h2>
                   </div>
+                  
+                  {/* Auto Parse Section for Custom Questions */}
+                  <div className="mb-6 p-4 glass-red rounded-lg transform transition-all duration-300 hover:scale-[1.02]">
+                    <div className="flex items-center mb-3">
+                      <Link className="w-5 h-5 text-red-500 mr-2" />
+                      <h3 className="font-medium">Auto Parse Job Details</h3>
+                    </div>
+                    <div className="flex gap-2 mb-3">
+                      <Input
+                        value={customJobUrl}
+                        onChange={(e) => setCustomJobUrl(e.target.value)}
+                        className="glass-input flex-1"
+                        placeholder="Paste job URL here..."
+                      />
+                      <Button
+                        onClick={() => parseJobUrl(true)}
+                        disabled={isParsingCustom}
+                        className="glass-button hover:glass-red"
+                      >
+                        {isParsingCustom ? (
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          'Parse'
+                        )}
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                      <span>Supported sites:</span>
+                      {supportedSites.map((site, index) => (
+                        <div key={index} className="flex items-center gap-1">
+                          <site.icon className="w-4 h-4" />
+                          <span>{site.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="customCompanyName">Company Name</Label>
+                        <Input
+                          id="customCompanyName" 
+                          value={customCompanyName} 
+                          onChange={(e) => setCustomCompanyName(e.target.value)}
+                          className="glass-input mt-1" 
+                          placeholder="Google, Microsoft, etc."
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="customJobTitle">Job Title</Label>
+                        <Input
+                          id="customJobTitle" 
+                          value={customJobTitle} 
+                          onChange={(e) => setCustomJobTitle(e.target.value)}
+                          className="glass-input mt-1" 
+                          placeholder="Software Engineer"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="customMaxCharacters">Max Characters</Label>
+                      <Input 
+                        type='number'
+                        id="customMaxCharacters" 
+                        value={customMaxCharacters} 
+                        onChange={(e) => setCustomMaxCharacters(parseInt(e.target.value))}
+                        className="glass-input mt-1" 
+                        placeholder="1500"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="customJobDescription">Job Description</Label>
+                      <Textarea
+                        id="customJobDescription" 
+                        value={customJobDescription} 
+                        onChange={(e) => setCustomJobDescription(e.target.value)}
+                        className="glass-input mt-1 min-h-[200px]" 
+                        placeholder="Paste the complete job description here..."
+                      />
+                    </div>
                     <div>
                       <Label htmlFor="customQuestions">Questions</Label>
                       <Textarea
                         id="customQuestions" 
                         value={customQuestions} 
                         onChange={(e) => setCustomQuestions(e.target.value)}
-                        className="glass-input mt-1 min-h-[400px]" 
+                        className="glass-input mt-1 min-h-[200px]" 
                         placeholder="Enter your custom questions here, one per line:&#10;&#10;1. Why do you want to work for this company?&#10;2. What are your greatest strengths?&#10;3. Describe a challenging project you worked on..."
                       />
                     </div>
@@ -285,7 +427,7 @@ const CoverLetterGenerator = () => {
                 <Button
                   onClick={handleGenerate} 
                   disabled={isGenerating}
-                  className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button py-3 mt-6"
+                  className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button py-3 mt-6 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
                 >
                   {isGenerating ? (
                     <>
@@ -301,7 +443,7 @@ const CoverLetterGenerator = () => {
                 </Button>
               </Card>
 
-              <Card className="glass-card p-4 md:p-6" ref={sectionRef}>
+              <Card className="glass-card p-4 md:p-6 transition-all duration-500 ease-in-out transform" ref={sectionRef}>
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center">
                     <Sparkles className="w-6 h-6 text-red-500 mr-2" />
@@ -316,7 +458,7 @@ const CoverLetterGenerator = () => {
                         onClick={handleCopy} 
                         variant="outline" 
                         size="sm" 
-                        className="glass-button hover:glass-red"
+                        className="glass-button hover:glass-red transition-all duration-300 hover:scale-105"
                       >
                         <Copy className="w-4 h-4" />
                       </Button>
@@ -324,7 +466,7 @@ const CoverLetterGenerator = () => {
                         onClick={handleDownload} 
                         variant="outline" 
                         size="sm" 
-                        className="glass-button hover:glass-red"
+                        className="glass-button hover:glass-red transition-all duration-300 hover:scale-105"
                       >
                         <Download className="w-4 h-4" />
                       </Button>
@@ -338,7 +480,7 @@ const CoverLetterGenerator = () => {
                       {activeTab === 'cover-letter' ? generatedLetter : generatedAnswers}
                     </div>
                   ) : (
-                    <div className="glass-red rounded-lg p-8 text-center text-muted-foreground">
+                    <div className="glass-red rounded-lg p-8 text-center text-muted-foreground animate-pulse">
                       <Sparkles className="w-16 h-16 mx-auto mb-4 opacity-50" />
                       <p>
                         Your AI-generated {activeTab === 'cover-letter' ? 'cover letter' : 'answers'} will appear here
