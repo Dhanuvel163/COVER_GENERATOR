@@ -12,6 +12,7 @@ import { generateCover } from "@/api/profile";
 import { toast } from "sonner";
 import { useUserStore } from '@/store/userStore';
 import { errorStyle, successStyle } from '@/lib/toastStyles';
+import { useNavigate } from 'react-router-dom';
 
 const CoverLetterGenerator = () => {
   const [activeTab, setActiveTab] = useState('cover-letter');
@@ -27,6 +28,15 @@ const CoverLetterGenerator = () => {
   const [isParsing, setIsParsing] = useState(false);
   const token = useUserStore((state) => state?.token);
   const sectionRef = useRef(null);
+  const removeIsLoggedIn = useUserStore((state) => state.removeIsLoggedIn);
+  const clearUser = useUserStore((state) => state.clearUser);
+  const navigate = useNavigate();
+
+  const logout = () => {
+    removeIsLoggedIn();
+    clearUser()
+    navigate("/");
+  };
 
   const supportedSites = [
     { name: 'LinkedIn', icon: Linkedin, domain: 'linkedin.com' },
@@ -75,55 +85,63 @@ const CoverLetterGenerator = () => {
   };
 
   const handleGenerate = async () => {
-    if (activeTab === 'cover-letter') {
-      if (!jobDescription.trim()) {
-        toast.error("Job Description is mandatory.", errorStyle);
-        return;
-      } else if (!companyName.trim()) {
-        toast.error("Company Name is mandatory.", errorStyle);
-        return;
-      } else if (!jobTitle.trim()) {
-        toast.error("Job Title is mandatory.", errorStyle);
-        return;
+    try{
+      if (activeTab === 'cover-letter') {
+        if (!jobDescription.trim()) {
+          toast.error("Job Description is mandatory.", errorStyle);
+          return;
+        } else if (!companyName.trim()) {
+          toast.error("Company Name is mandatory.", errorStyle);
+          return;
+        } else if (!jobTitle.trim()) {
+          toast.error("Job Title is mandatory.", errorStyle);
+          return;
+        }
+        
+        setIsGenerating(true);
+        try {
+          const response = await generateCover(token, {
+            jobDescription,
+            companyName,
+            jobTitle,
+            maxCharacters
+          });
+          setGeneratedLetter(response.data?.coverLetter);
+        } catch (error) {
+          toast.error("Failed to generate cover letter.", errorStyle);
+        } finally {
+          setIsGenerating(false);
+        }
+      } else {
+        if (!customQuestions.trim()) {
+          toast.error("Custom Questions are mandatory.", errorStyle);
+          return;
+        }
+        
+        setIsGenerating(true);
+        try {
+          // Mock API call for custom questions
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          setGeneratedAnswers("Here are the generated answers to your custom questions...\n\n1. Answer to first question...\n\n2. Answer to second question...");
+          toast.success("Custom answers generated successfully!", successStyle);
+        } catch (error) {
+          toast.error("Failed to generate answers.", errorStyle);
+        } finally {
+          setIsGenerating(false);
+        }
       }
-      
-      setIsGenerating(true);
-      try {
-        const response = await generateCover(token, {
-          jobDescription,
-          companyName,
-          jobTitle,
-          maxCharacters
-        });
-        setGeneratedLetter(response.data?.coverLetter);
-      } catch (error) {
-        toast.error("Failed to generate cover letter.", errorStyle);
-      } finally {
-        setIsGenerating(false);
-      }
-    } else {
-      if (!customQuestions.trim()) {
-        toast.error("Custom Questions are mandatory.", errorStyle);
-        return;
-      }
-      
-      setIsGenerating(true);
-      try {
-        // Mock API call for custom questions
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        setGeneratedAnswers("Here are the generated answers to your custom questions...\n\n1. Answer to first question...\n\n2. Answer to second question...");
-        toast.success("Custom answers generated successfully!", successStyle);
-      } catch (error) {
-        toast.error("Failed to generate answers.", errorStyle);
-      } finally {
-        setIsGenerating(false);
-      }
+      sectionRef.current?.scrollIntoView({ 
+        behavior: "smooth",
+        block: "start"
+      });
+    } catch (error) {
+      if(error?.response?.data?.message?.toLowerCase()=="invalid token"){
+        toast.error("Session Expired",errorStyle);
+        logout()
+      }else toast.error("Something went wrong, Please try again later",errorStyle);
+    }finally{
+      setIsGenerating(false);
     }
-    
-    sectionRef.current?.scrollIntoView({ 
-      behavior: "smooth",
-      block: "start"
-    });
   };
 
   const handleCopy = () => {
