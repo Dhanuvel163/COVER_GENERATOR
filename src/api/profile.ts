@@ -33,3 +33,19 @@ export const generateCover = async (token: string, data) => {
     },
   });
 };
+
+export const generateCustomAnswers = async (token: string, data) => {
+  return axios.post(`${BASE_URL}/api/user/generate-answers`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const parseJobUrl = async (token: string, data) => {
+  return axios.post(`${BASE_URL}/api/user/parse-job-url`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
