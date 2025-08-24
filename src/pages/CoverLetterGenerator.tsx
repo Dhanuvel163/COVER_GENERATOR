@@ -20,21 +20,12 @@ const CoverLetterGenerator = () => {
   const [companyName, setCompanyName] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [jobUrl, setJobUrl] = useState('');
-  
-  // Custom Questions tab - same fields as cover letter
-  const [customJobDescription, setCustomJobDescription] = useState('');
-  const [customCompanyName, setCustomCompanyName] = useState('');
-  const [customJobTitle, setCustomJobTitle] = useState('');
-  const [customJobUrl, setCustomJobUrl] = useState('');
-  const [customMaxCharacters, setCustomMaxCharacters] = useState(1500);
   const [customQuestions, setCustomQuestions] = useState('');
-  
   const [generatedLetter, setGeneratedLetter] = useState('');
   const [generatedAnswers, setGeneratedAnswers] = useState('');
   const [maxCharacters, setMaxCharacters] = useState(1500);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
-  const [isParsingCustom, setIsParsingCustom] = useState(false);
   const token = useUserStore((state) => state?.token);
   const sectionRef = useRef(null);
   const removeIsLoggedIn = useUserStore((state) => state.removeIsLoggedIn);
@@ -49,13 +40,10 @@ const CoverLetterGenerator = () => {
 
   const supportedSites = [
     { name: 'LinkedIn', icon: Linkedin, domain: 'linkedin.com' },
-    { name: 'Naukri', icon: Globe, domain: 'naukri.com' },
-    { name: 'Indeed', icon: Globe, domain: 'indeed.com' },
-    { name: 'Glassdoor', icon: Globe, domain: 'glassdoor.com' }
   ];
 
-  const parseJobUrl = async (isCustomTab = false) => {
-    const url = isCustomTab ? customJobUrl : jobUrl;
+  const parseJobUrl = async () => {
+    const url = jobUrl;
     if (!url.trim()) {
       toast.error("Please enter a job URL.", errorStyle);
       return;
@@ -64,26 +52,13 @@ const CoverLetterGenerator = () => {
       toast.error("Please enter a valid job URL.", errorStyle);
       return;
     }
-    
-    if (isCustomTab) {
-      setIsParsingCustom(true);
-    } else {
-      setIsParsing(true);
-    }
-    
+    setIsParsing(true);
     try {
       const parsedUrl = new URL(url);
       let response = await parseJD(token, {url: parsedUrl});
-      
-      if (isCustomTab) {
-        if(response?.data?.response?.company) setCustomCompanyName(response?.data?.response?.company)
-        if(response?.data?.response?.title) setCustomJobTitle(response?.data?.response?.title)
-        if(response?.data?.response?.jobDescription) setCustomJobDescription(response?.data?.response?.jobDescription)
-      } else {
-        if(response?.data?.response?.company) setCompanyName(response?.data?.response?.company)
-        if(response?.data?.response?.title) setJobTitle(response?.data?.response?.title)
-        if(response?.data?.response?.jobDescription) setJobDescription(response?.data?.response?.jobDescription)
-      }
+      if(response?.data?.response?.company) setCompanyName(response?.data?.response?.company)
+      if(response?.data?.response?.title) setJobTitle(response?.data?.response?.title)
+      if(response?.data?.response?.jobDescription) setJobDescription(response?.data?.response?.jobDescription)
       toast.success("Job details parsed successfully!", successStyle);
     } catch (error) {
       if(error?.response?.data?.message?.toLowerCase()=="invalid token"){
@@ -93,26 +68,22 @@ const CoverLetterGenerator = () => {
         toast.error(error?.response?.data?.message,errorStyle);
       } else toast.error("Failed to parse job URL. Please check the URL format.",errorStyle);
     } finally {
-      if (isCustomTab) {
-        setIsParsingCustom(false);
-      } else {
-        setIsParsing(false);
-      }
+      setIsParsing(false);
     }
   };
 
   const handleGenerate = async () => {
+    if (!jobDescription.trim()) {
+      toast.error("Job Description is mandatory.", errorStyle);
+      return;
+    } else if (!companyName.trim()) {
+      toast.error("Company Name is mandatory.", errorStyle);
+      return;
+    } else if (!jobTitle.trim()) {
+      toast.error("Job Title is mandatory.", errorStyle);
+      return;
+    }
     if (activeTab === 'cover-letter') {
-      if (!jobDescription.trim()) {
-        toast.error("Job Description is mandatory.", errorStyle);
-        return;
-      } else if (!companyName.trim()) {
-        toast.error("Company Name is mandatory.", errorStyle);
-        return;
-      } else if (!jobTitle.trim()) {
-        toast.error("Job Title is mandatory.", errorStyle);
-        return;
-      }
       setIsGenerating(true);
       try {
         const response = await generateCover(token, {
@@ -133,20 +104,6 @@ const CoverLetterGenerator = () => {
         setIsGenerating(false);
       }
     } else {
-      if (!customJobDescription.trim()) {
-        toast.error("Job Description is mandatory.", errorStyle);
-        return;
-      } else if (!customCompanyName.trim()) {
-        toast.error("Company Name is mandatory.", errorStyle);
-        return;
-      } else if (!customJobTitle.trim()) {
-        toast.error("Job Title is mandatory.", errorStyle);
-        return;
-      } else if (!customQuestions.trim()) {
-        toast.error("Custom Questions are mandatory.", errorStyle);
-        return;
-      }
-      
       if (!customQuestions.trim()) {
         toast.error("Custom Questions are mandatory.", errorStyle);
         return;
@@ -154,11 +111,11 @@ const CoverLetterGenerator = () => {
       setIsGenerating(true);
       try {
         const response = await generateCustomAnswers(token, {
-          jobDescription: customJobDescription,
-          companyName: customCompanyName,
-          jobTitle: customJobTitle,
+          jobDescription: jobDescription,
+          companyName: companyName,
+          jobTitle: jobTitle,
           customQuestions,
-          maxCharacters: customMaxCharacters
+          maxCharacters: maxCharacters
         });
         setGeneratedAnswers(response.data?.answers || "Generated answers will appear here...");
       } catch (error) {
@@ -256,7 +213,7 @@ const CoverLetterGenerator = () => {
                         placeholder="Paste job URL here..."
                       />
                       <Button
-                        onClick={() => parseJobUrl(false)}
+                        onClick={() => parseJobUrl()}
                         disabled={isParsing}
                         className="glass-button hover:glass-red"
                       >
@@ -339,17 +296,17 @@ const CoverLetterGenerator = () => {
                     </div>
                     <div className="flex gap-2 mb-3">
                       <Input
-                        value={customJobUrl}
-                        onChange={(e) => setCustomJobUrl(e.target.value)}
+                        value={jobUrl}
+                        onChange={(e) => setJobUrl(e.target.value)}
                         className="glass-input flex-1"
                         placeholder="Paste job URL here..."
                       />
                       <Button
-                        onClick={() => parseJobUrl(true)}
-                        disabled={isParsingCustom}
+                        onClick={() => parseJobUrl()}
+                        disabled={isParsing}
                         className="glass-button hover:glass-red"
                       >
-                        {isParsingCustom ? (
+                        {isParsing ? (
                           <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                         ) : (
                           'Parse'
@@ -373,8 +330,8 @@ const CoverLetterGenerator = () => {
                         <Label htmlFor="customCompanyName">Company Name</Label>
                         <Input
                           id="customCompanyName" 
-                          value={customCompanyName} 
-                          onChange={(e) => setCustomCompanyName(e.target.value)}
+                          value={companyName} 
+                          onChange={(e) => setCompanyName(e.target.value)}
                           className="glass-input mt-1" 
                           placeholder="Google, Microsoft, etc."
                         />
@@ -383,8 +340,8 @@ const CoverLetterGenerator = () => {
                         <Label htmlFor="customJobTitle">Job Title</Label>
                         <Input
                           id="customJobTitle" 
-                          value={customJobTitle} 
-                          onChange={(e) => setCustomJobTitle(e.target.value)}
+                          value={jobTitle} 
+                          onChange={(e) => setJobTitle(e.target.value)}
                           className="glass-input mt-1" 
                           placeholder="Software Engineer"
                         />
@@ -395,8 +352,8 @@ const CoverLetterGenerator = () => {
                       <Input 
                         type='number'
                         id="customMaxCharacters" 
-                        value={customMaxCharacters} 
-                        onChange={(e) => setCustomMaxCharacters(parseInt(e.target.value))}
+                        value={maxCharacters} 
+                        onChange={(e) => setMaxCharacters(parseInt(e.target.value))}
                         className="glass-input mt-1" 
                         placeholder="1500"
                       />
@@ -405,8 +362,8 @@ const CoverLetterGenerator = () => {
                       <Label htmlFor="customJobDescription">Job Description</Label>
                       <Textarea
                         id="customJobDescription" 
-                        value={customJobDescription} 
-                        onChange={(e) => setCustomJobDescription(e.target.value)}
+                        value={jobDescription} 
+                        onChange={(e) => setJobDescription(e.target.value)}
                         className="glass-input mt-1 min-h-[200px]" 
                         placeholder="Paste the complete job description here..."
                       />
