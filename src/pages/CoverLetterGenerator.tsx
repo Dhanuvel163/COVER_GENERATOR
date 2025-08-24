@@ -114,10 +114,10 @@ const CoverLetterGenerator = () => {
           jobDescription: jobDescription,
           companyName: companyName,
           jobTitle: jobTitle,
-          customQuestions,
+          questions: customQuestions,
           maxCharacters: maxCharacters
         });
-        setGeneratedAnswers(response.data?.answers || "Generated answers will appear here...");
+        if (response.data?.answer )setGeneratedAnswers(response.data?.answer);
       } catch (error) {
         if(error?.response?.data?.message?.toLowerCase()=="invalid token"){
           toast.error("Session Expired",errorStyle);
