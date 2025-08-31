@@ -8,6 +8,7 @@ import ContactUs from "./pages/ContactUs";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -24,6 +25,7 @@ const App = () => (
       </Routes>
     </BrowserRouter>
     <Analytics/>
+    <SpeedInsights />
   </QueryClientProvider>
 );
 
