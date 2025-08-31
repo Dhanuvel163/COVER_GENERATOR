@@ -1,0 +1,40 @@
+{
+  "short_name": "Cover AI",
+  "name": "Cover Letter & Custom Question Answering Assistant",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "description": "Generate personalized, professional cover letters tailored to any job description in seconds using AI. Optimize your job applications and land your dream job.",
+  "author":"Dhanavel R",
+  "developer": {"name": "Dhanavel","url": "https://github.com/Dhanuvel163"},
+  "shortcuts": [
+    {
+      "name": "Generate Cover Letter",
+      "short_name": "Generate CL",
+      "description": "Generate a new AI-powered cover letter",
+      "url": "/generator",
+      "icons": [{"src": "/android-chrome-192x192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "View Profile",
+      "short_name": "Profile",
+      "description": "View and manage your professional profile",
+      "url": "/profile",
+      "icons": [{"src": "/android-chrome-192x192.png", "sizes": "192x192"}]
+    }
+  ],
+  "categories": ["productivity", "education", "business", "utilities", "jobs", "cover letter", "AI"]
+}
