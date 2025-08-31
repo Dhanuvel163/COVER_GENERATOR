@@ -7,26 +7,26 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ContactUs from "./pages/ContactUs";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "sonner";
-import { Analytics } from "@vercel/analytics/next"
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/react"
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <Toaster position="top-right" className="toast" />
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/generator" element={<CoverLetterGenerator />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/contact-us" element={<ContactUs />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
-    <Analytics/>
+  <>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Toaster position="top-right" className="toast" />
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/generator" element={<CoverLetterGenerator />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/contact-us" element={<ContactUs />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
     <SpeedInsights />
-  </QueryClientProvider>
+  </>
 );
 
 export default App;
