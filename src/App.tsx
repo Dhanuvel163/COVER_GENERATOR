@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import CoverLetterGenerator from "./pages/CoverLetterGenerator";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ContactUs from "./pages/ContactUs";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "sonner";
 
@@ -16,6 +18,8 @@ const App = () => (
         <Route path="/" element={<Index />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/generator" element={<CoverLetterGenerator />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/contact-us" element={<ContactUs />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

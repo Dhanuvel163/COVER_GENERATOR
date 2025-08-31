@@ -8,6 +8,7 @@ import AuthModal from "@/components/AuthModal";
 import GlassBackground from "@/components/GlassBackground";
 import { useUserStore } from "@/store/userStore";
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 const Index = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -134,110 +135,113 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      <GlassBackground />
-      <Header handleAuth={handleAuth}/>
-      <main className="relative z-10 px-6 py-6 md:py-16">
-        <div className="max-w-7xl mx-auto text-center">
-          <Badge className="text-[9px] md:text-xs mb-6 glass-red text-red-500 border-red-500/30 animate-fade-in hover:text-white">
-            ✨ AI-Powered Cover Letter Generator
-          </Badge>
-          <h1 className="text-3xl md:text-6xl font-bold mb-6 animate-fade-in">
-            Craft Perfect
-            <span className="block bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
-              Cover Letters
-            </span>
-            in Seconds
-          </h1>
-          <p className="text-sm md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-slide-in">
-            Transform your job applications with AI-generated cover letters tailored to any job description. 
-            Upload your profile, paste the JD, and let our AI create compelling cover letters that get you noticed.
-          </p>
-          {isLoggedIn ? (
-            <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-16">
-              {quickActions.map((action, index) => (
-                <Card  key={index} onClick={action.action}
-                  className="glass-card p-6 cursor-pointer hover:scale-105 transition-all duration-300">
-                  <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${action.color} mx-auto mb-4 flex items-center justify-center text-white`}>
-                    {action.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">{action.title}</h3>
-                  <p className="text-muted-foreground">{action.description}</p>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-slide-in">
-              <Button size="lg" onClick={() => handleAuth('signup')}
-                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-4 text-lg glass-button">
-                Get Started Free
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </div>
-          )}
-          <hr className='mb-16'/>
-          
-          {/* Main Features Section */}
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-20">
-            {mainFeatures.map((feature, index) => (
-              <Card key={index} style={{ animationDelay: `${index * 0.2}s` }}
-                className="glass-card p-6 text-center hover:glass-red transition-all duration-500 animate-fade-in group hover:scale-105 hover:shadow-2xl">
-                <div className="w-12 h-12 rounded-xl glass-red mx-auto mb-4 flex items-center justify-center text-red-500">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-sm font-medium text-red-500 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  {feature.catchyLine}
-                </p>
-                <p className="text-muted-foreground">{feature.description}</p>
-              </Card>
-            ))}
-          </div>
-
-          {/* All Features Showcase */}
-          <div className="mb-16">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
-                Everything You Need to Land Your Dream Job
-              </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Discover all the powerful features that make job applications effortless and effective
-              </p>
-            </div>
+    <>
+      <div className="min-h-screen relative overflow-hidden">
+        <GlassBackground />
+        <Header handleAuth={handleAuth}/>
+        <main className="relative z-10 px-6 py-6 md:py-16">
+          <div className="max-w-7xl mx-auto text-center">
+            <Badge className="text-[9px] md:text-xs mb-6 glass-red text-red-500 border-red-500/30 animate-fade-in hover:text-white">
+              ✨ AI-Powered Cover Letter Generator
+            </Badge>
+            <h1 className="text-3xl md:text-6xl font-bold mb-6 animate-fade-in">
+              Craft Perfect
+              <span className="block bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+                Cover Letters
+              </span>
+              in Seconds
+            </h1>
+            <p className="text-sm md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-slide-in">
+              Transform your job applications with AI-generated cover letters tailored to any job description. 
+              Upload your profile, paste the JD, and let our AI create compelling cover letters that get you noticed.
+            </p>
+            {isLoggedIn ? (
+              <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-16">
+                {quickActions.map((action, index) => (
+                  <Card  key={index} onClick={action.action}
+                    className="glass-card p-6 cursor-pointer hover:scale-105 transition-all duration-300">
+                    <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${action.color} mx-auto mb-4 flex items-center justify-center text-white`}>
+                      {action.icon}
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">{action.title}</h3>
+                    <p className="text-muted-foreground">{action.description}</p>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-slide-in">
+                <Button size="lg" onClick={() => handleAuth('signup')}
+                  className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-4 text-lg glass-button">
+                  Get Started Free
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </div>
+            )}
+            <hr className='mb-16'/>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-              {allFeatures.map((feature, index) => (
-                <Card 
-                  key={index} 
-                  className="glass-card p-6 text-center transition-all duration-500 hover:scale-105 hover:shadow-2xl group cursor-pointer feature-card"
-                  style={{ animationDelay: feature.delay }}
-                >
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} mx-auto mb-4 flex items-center justify-center text-white transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-6`}>
+            {/* Main Features Section */}
+            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-20">
+              {mainFeatures.map((feature, index) => (
+                <Card key={index} style={{ animationDelay: `${index * 0.2}s` }}
+                  className="glass-card p-6 text-center hover:glass-red transition-all duration-500 animate-fade-in group hover:scale-105 hover:shadow-2xl">
+                  <div className="w-12 h-12 rounded-xl glass-red mx-auto mb-4 flex items-center justify-center text-red-500">
                     {feature.icon}
                   </div>
-                  <h3 className="text-lg font-semibold mb-2 group-hover:text-red-500 transition-colors duration-300">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm font-medium text-transparent bg-gradient-to-r from-red-500 to-red-600 bg-clip-text mb-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-sm font-medium text-red-500 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     {feature.catchyLine}
                   </p>
-                  <p className="text-sm text-muted-foreground leading-relaxed group-hover:text-gray-600 transition-colors duration-300">
-                    {feature.description}
-                  </p>
-                  
-                  {/* Hover overlay effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-red-600/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  <p className="text-muted-foreground">{feature.description}</p>
                 </Card>
               ))}
             </div>
+
+            {/* All Features Showcase */}
+            <div className="mb-16">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+                  Everything You Need to Land Your Dream Job
+                </h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Discover all the powerful features that make job applications effortless and effective
+                </p>
+              </div>
+              
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                {allFeatures.map((feature, index) => (
+                  <Card 
+                    key={index} 
+                    className="glass-card p-6 text-center transition-all duration-500 hover:scale-105 hover:shadow-2xl group cursor-pointer feature-card"
+                    style={{ animationDelay: feature.delay }}
+                  >
+                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} mx-auto mb-4 flex items-center justify-center text-white transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-6`}>
+                      {feature.icon}
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2 group-hover:text-red-500 transition-colors duration-300">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm font-medium text-transparent bg-gradient-to-r from-red-500 to-red-600 bg-clip-text mb-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                      {feature.catchyLine}
+                    </p>
+                    <p className="text-sm text-muted-foreground leading-relaxed group-hover:text-gray-600 transition-colors duration-300">
+                      {feature.description}
+                    </p>
+                    
+                    {/* Hover overlay effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-red-600/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  </Card>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </main>
-      <div className="absolute top-20 left-10 w-20 h-20 rounded-full glass-red animate-float opacity-60" />
-      <div className="absolute top-40 right-20 w-16 h-16 rounded-full glass animate-float opacity-40" style={{ animationDelay: '1s' }} />
-      <div className="absolute bottom-20 left-1/4 w-12 h-12 rounded-full glass-red animate-float opacity-50" style={{ animationDelay: '2s' }} />
-      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} mode={authMode}/>
-    </div>
+        </main>
+        <div className="absolute top-20 left-10 w-20 h-20 rounded-full glass-red animate-float opacity-60" />
+        <div className="absolute top-40 right-20 w-16 h-16 rounded-full glass animate-float opacity-40" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-20 left-1/4 w-12 h-12 rounded-full glass-red animate-float opacity-50" style={{ animationDelay: '2s' }} />
+        <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} mode={authMode}/>
+      </div>
+      <Footer/>
+    </>
   );
 };
 
