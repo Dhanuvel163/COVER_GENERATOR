@@ -13,10 +13,13 @@ const ContactUs: React.FC = () => {
     const [email, setEmail] = useState('');
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+
         const data = { mail:email, subject:title, description };
+        setIsSubmitting(true);
         try {
             await submitContactForm(data);
             toast.success('Message sent successfully!', successStyle);
@@ -28,6 +31,8 @@ const ContactUs: React.FC = () => {
             if(error?.response?.data?.show_message){
                 toast.error(error?.response?.data?.message,errorStyle);
             }else toast.error("Error Contacting.",errorStyle);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -79,8 +84,13 @@ const ContactUs: React.FC = () => {
                                 <Button 
                                     type="submit" 
                                     className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button"
+                                    disabled={isSubmitting}
                                 >
-                                    Submit
+                                    {isSubmitting ? (
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                        'Submit'
+                                    )}
                                 </Button>
                             </div>
                         </form>

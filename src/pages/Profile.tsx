@@ -24,9 +24,14 @@ const Profile = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const setUser = useUserStore((state) => state.setUser);
   const token = useUserStore((state) => state?.token);
+  const [isLoading, setIsLoading] = useState(true); // Added loading state
 
   const getProfile = async () => {
-    if (!token) return;
+    if (!token) {
+        setIsLoading(false);
+        return;
+    }
+    setIsLoading(true); // Set loading true before fetch
     try {
       const { data } = await fetchUserProfile(token);
       const user = data.user || {};
@@ -44,6 +49,8 @@ const Profile = () => {
       setUser(user);
     } catch (error) {
       console.error("Failed to fetch user profile:", error);
+    } finally {
+      setIsLoading(false); // Set loading false after fetch
     }
   };
 
@@ -63,6 +70,7 @@ const Profile = () => {
         toast.error("You must be logged in to upload a resume.",errorStyle);
         return;
       }
+      setIsLoading(true); // Set loading true before upload
       try {
         const formData = new FormData();
         formData.append("resume", file);
@@ -76,6 +84,8 @@ const Profile = () => {
         }else{
           toast.error("Failed to upload resume.",errorStyle);
         }
+      } finally {
+        setIsLoading(false); // Set loading false after upload
       }
     }
   };
@@ -86,6 +96,7 @@ const Profile = () => {
 
   const handleSave = async () => {
     if (!token) return;
+    setIsLoading(true); // Set loading true before save
     try {
       if (!profile.fullName?.trim()) {
         toast.error("Name is mandatory.",errorStyle);
@@ -118,6 +129,8 @@ const Profile = () => {
       }else{
         toast.error("Failed to update profile.",errorStyle);
       }
+    } finally {
+      setIsLoading(false); // Set loading false after save
     }
   };
 
@@ -184,8 +197,14 @@ const Profile = () => {
                 </div>
                 <Button onClick={handleSave}
                   className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white glass-button">
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Profile
+                  {isLoading ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      {'Save Profile'}
+                    </>
+                  )}
                 </Button>
               </div>
             </Card>
@@ -203,7 +222,11 @@ const Profile = () => {
                     onChange={handleResumeUpload} className="hidden"/>
                   <Button type="button" className="glass-button hover:glass-red"
                     onClick={handleResumeButtonClick}>
-                    Choose File
+                    {isLoading ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      'Choose File'
+                    )}
                   </Button>
                   {resumeUrl && (
                     <div className='max-w-[200px] md:max-w-none mx-auto'>

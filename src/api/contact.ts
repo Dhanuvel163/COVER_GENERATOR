@@ -8,7 +8,7 @@ interface ContactFormValues {
 
 export const submitContactForm = async (data: ContactFormValues) => {
     try {
-        const response = await fetch(`${BASE_URL}api/user/contact`, {
+        const response = await fetch(`${BASE_URL}/api/user/contact`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
