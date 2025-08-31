@@ -7,7 +7,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ContactUs from "./pages/ContactUs";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "sonner";
-
+import { Analytics } from "@vercel/analytics/next"
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -23,6 +23,7 @@ const App = () => (
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
+    <Analytics/>
   </QueryClientProvider>
 );
 
