@@ -168,7 +168,9 @@ const Index = () => {
                 <div className='animate-slide-in'>
                   <a href="https://chromewebstore.google.com/detail/jgicpdojkhomhbojigkklnbopaebbdeh?utm_source=cover-ai-site" target="_blank" rel="noopener noreferrer">
                     <Button size="lg" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 md:px-8 py-2 md:py-4 glass-button transition-all duration-300 hover:scale-105">
-                      Get the <span className='hidden md:inline-block'>Cover AI</span> Extension
+                      <span>
+                        Get the <span className='hidden md:inline-block'>Cover AI</span> Extension
+                      </span>
                       <ArrowRight className="ml-2 w-5 h-5" />
                     </Button>
                   </a>
@@ -177,9 +179,10 @@ const Index = () => {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-in">
                     <Button size="lg" onClick={() => isLoggedIn ? navigate('/generator') : handleAuth('signup')}
                       className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 md:px-8 py-2 md:py-4 glass-button">
-                      <span className='hidden md:inline-block'>Get Started</span> 
-                      <span className="md:hidden">Start</span>
-                      With Website
+                      <span>
+                        <span className='hidden md:inline-block'>Get Started</span> 
+                        <span className="md:hidden">Start</span> With Website
+                      </span>
                       <ArrowRight className="ml-2 w-5 h-5" />
                     </Button>
                   </div>
