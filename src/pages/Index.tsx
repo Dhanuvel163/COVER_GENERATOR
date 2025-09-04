@@ -139,22 +139,54 @@ const Index = () => {
       <div className="min-h-screen relative overflow-hidden">
         <GlassBackground />
         <Header handleAuth={handleAuth}/>
-        <main className="relative z-10 px-6 py-6 md:py-16">
+        <main className="relative z-10 px-6 py-6 md:py-10">
           <div className="max-w-7xl mx-auto text-center">
             <Badge className="text-[9px] md:text-xs mb-6 glass-red text-red-500 border-red-500/30 animate-fade-in hover:text-white">
               ✨ AI-Powered Cover Letter Generator
             </Badge>
-            <h1 className="text-3xl md:text-6xl font-bold mb-6 animate-fade-in">
+            <h1 className="text-3xl md:text-5xl font-bold mb-6 animate-fade-in">
               Craft Perfect
               <span className="block bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
                 Cover Letters
               </span>
               in Seconds
             </h1>
-            <p className="text-sm md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-slide-in">
+            <p className="text-sm md:text-lg text-muted-foreground mb-8 max-w-3xl mx-auto animate-slide-in">
               Transform your job applications with AI-generated cover letters tailored to any job description. 
               Upload your profile, paste the JD, and let our AI create compelling cover letters that get you noticed.
             </p>
+
+            {/* Extension Promotion Section */}
+            <div className="bg-gradient-to-r from-red-500/10 to-red-600/10 border border-red-500/30 rounded-lg p-6 md:p-8 mb-16 animate-fade-in-up shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.01] max-w-[900px] m-auto">
+              <h2 className="text-xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+                Supercharge Your Applications with Our Chrome Extension!
+              </h2>
+              <p className="text-sm md:text-md text-muted-foreground mb-6">
+                Don't leave the page! Our Cover AI Extension auto-parses job details directly from any job posting and generates tailored cover letters and custom Q&A answers on the spot. Apply faster, smarter, and with unmatched personalization.
+              </p>
+              <div className='text-sm md:text-lg flex-col lg:flex-row flex justify-between items-center gap-3'>
+                <div className='animate-slide-in'>
+                  <a href="https://chromewebstore.google.com/detail/jgicpdojkhomhbojigkklnbopaebbdeh?utm_source=cover-ai-site" target="_blank" rel="noopener noreferrer">
+                    <Button size="lg" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 md:px-8 py-2 md:py-4 glass-button transition-all duration-300 hover:scale-105">
+                      Get the <span className='hidden md:inline-block'>Cover AI</span> Extension
+                      <ArrowRight className="ml-2 w-5 h-5" />
+                    </Button>
+                  </a>
+                </div>
+                <div>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-in">
+                    <Button size="lg" onClick={() => isLoggedIn ? navigate('/generator') : handleAuth('signup')}
+                      className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 md:px-8 py-2 md:py-4 glass-button">
+                      <span className='hidden md:inline-block'>Get Started</span> 
+                      <span className="md:hidden">Start</span>
+                      With Website
+                      <ArrowRight className="ml-2 w-5 h-5" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {isLoggedIn ? (
               <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-16">
                 {quickActions.map((action, index) => (
@@ -170,11 +202,6 @@ const Index = () => {
               </div>
             ) : (
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-slide-in">
-                <Button size="lg" onClick={() => handleAuth('signup')}
-                  className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-4 text-lg glass-button">
-                  Get Started Free
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
               </div>
             )}
             <hr className='mb-16'/>
