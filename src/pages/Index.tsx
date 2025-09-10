@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,11 +15,18 @@ const Index = () => {
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
   const navigate = useNavigate();
+  const supportedSitesRef = useRef<HTMLDivElement | null>(null);
 
   const handleAuth = (mode: 'login' | 'signup') => {
     setAuthMode(mode);
     setShowAuthModal(true);
   };
+
+  useEffect(() => {
+    if (window.location.hash === "#supported-sites" && supportedSitesRef.current) {
+      supportedSitesRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
 
   const mainFeatures = [
     {
@@ -151,40 +158,115 @@ const Index = () => {
               </span>
               in Seconds
             </h1>
-            <p className="text-sm md:text-lg text-muted-foreground mb-8 max-w-3xl mx-auto animate-slide-in">
+            <p className="text-sm md:text-lg text-muted-foreground max-w-3xl mx-auto animate-slide-in">
               Transform your job applications with AI-generated cover letters tailored to any job description. 
               Upload your profile, paste the JD, and let our AI create compelling cover letters that get you noticed.
             </p>
 
-            {/* Extension Promotion Section */}
-            <div className="bg-gradient-to-r from-red-500/10 to-red-600/10 border border-red-500/30 rounded-lg p-6 md:p-8 mb-16 animate-fade-in-up shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.01] max-w-[900px] m-auto">
-              <h2 className="text-xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
-                Supercharge Your Applications with Our Chrome Extension!
-              </h2>
-              <p className="text-sm md:text-md text-muted-foreground mb-6">
-                Don't leave the page! Our Cover AI Extension auto-parses job details directly from any job posting and generates tailored cover letters and custom Q&A answers on the spot. Apply faster, smarter, and with unmatched personalization.
-              </p>
-              <div className='text-sm md:text-lg flex-col lg:flex-row flex justify-between items-center gap-3'>
-                <div className='animate-slide-in'>
-                  <a href="https://chromewebstore.google.com/detail/jgicpdojkhomhbojigkklnbopaebbdeh?utm_source=cover-ai-site" target="_blank" rel="noopener noreferrer">
-                    <Button size="lg" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 md:px-8 py-2 md:py-4 glass-button transition-all duration-300 hover:scale-105">
-                      <span>
-                        Get the <span className='hidden md:inline-block'>Cover AI</span> Extension
-                      </span>
-                      <ArrowRight className="ml-2 w-5 h-5" />
-                    </Button>
-                  </a>
+            <div className='pt-8' id="supported-sites" ref={supportedSitesRef}>
+              {/* Extension Promotion Section */}
+              <div className="bg-gradient-to-r from-red-500/10 to-red-600/10 border border-red-500/30 rounded-lg p-6 md:p-8 mb-16 animate-fade-in-up shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.01] max-w-[900px] m-auto">
+                <h2 className="text-xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+                  Supercharge Your Applications with Our Chrome Extension!
+                </h2>
+                <p className="text-sm md:text-md text-muted-foreground mb-6">
+                  Don't leave the page! Our Cover AI Extension auto-parses job details directly from any job posting and generates tailored cover letters and custom Q&A answers on the spot. Apply faster, smarter, and with unmatched personalization.
+                </p>
+                <div className='text-sm md:text-lg flex-col lg:flex-row flex justify-between items-center gap-3'>
+                  <div className='animate-slide-in'>
+                    <a href="https://chromewebstore.google.com/detail/jgicpdojkhomhbojigkklnbopaebbdeh?utm_source=cover-ai-site" target="_blank" rel="noopener noreferrer">
+                      <Button size="lg" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 md:px-8 py-2 md:py-4 glass-button transition-all duration-300 hover:scale-105">
+                        <span>
+                          Get the <span className='hidden md:inline-block'>Cover AI</span> Extension
+                        </span>
+                        <ArrowRight className="ml-2 w-5 h-5" />
+                      </Button>
+                    </a>
+                  </div>
+                  <div>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-in">
+                      <Button size="lg" onClick={() => isLoggedIn ? navigate('/generator') : handleAuth('signup')}
+                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 md:px-8 py-2 md:py-4 glass-button">
+                        <span>
+                          <span className='hidden md:inline-block'>Get Started</span> 
+                          <span className="md:hidden">Start</span> With Website
+                        </span>
+                        <ArrowRight className="ml-2 w-5 h-5" />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-in">
-                    <Button size="lg" onClick={() => isLoggedIn ? navigate('/generator') : handleAuth('signup')}
-                      className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 md:px-8 py-2 md:py-4 glass-button">
-                      <span>
-                        <span className='hidden md:inline-block'>Get Started</span> 
-                        <span className="md:hidden">Start</span> With Website
-                      </span>
-                      <ArrowRight className="ml-2 w-5 h-5" />
-                    </Button>
+                {/* Supported Sites Section */}
+                <div className="mt-8 mb-12">
+                  <h3 className="text-lg md:text-xl font-semibold mb-4 text-center">
+                    Supported sites in extension
+                  </h3>
+                  <div className="flex flex-wrap justify-center gap-6">
+                    {/* Example logos, replace src with your actual logo paths or use icon libraries */}
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/linkedin.svg" alt="LinkedIn" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">LinkedIn</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/naukri.png" alt="Naukri" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">Naukri</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/upwork.svg" alt="Upwork" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">Upwork</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/freelancer.svg" alt="Freelancer" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">Freelancer</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/wellfound.webp" alt="WellFound" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">WellFound</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/indeed.svg" alt="Indeed" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">Indeed</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/instahyre.ico" alt="Instahyre" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">Instahyre</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/uplers.png" alt="Uplers" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">Uplers</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/talent500.jpeg" alt="Talent500" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">Talent500</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/remotecom.svg" alt="Remote.com" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">Remote.com</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/jsremotely.png" alt="Js Remotely" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">Js Remotely</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/remoteok.png" alt="Remote Ok" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">Remote Ok</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/weworkremotely.svg" alt="We Work Remotely" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">We Work Remotely</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/workingnomads.jpeg" alt="Working Nomads" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">Working Nomads</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/foundit.ico" alt="Found It" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">Found It</span>
+                    </div>
+                    <div className="flex flex-col items-center w-[100px]">
+                      <img src="/logos/peerlist.png" alt="Peerlist" className="w-10 h-10 mb-1" />
+                      <span className="text-xs">Peerlist</span>
+                    </div>
                   </div>
                 </div>
               </div>
