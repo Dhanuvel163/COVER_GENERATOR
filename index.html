@@ -4,12 +4,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CoverAI - Smart Cover Letter Generator</title>
-    <meta name="description" content="AI-powered cover letter generator with professional profile management" />
+    <title>CoverAI – Cover Letter & Custom Question Answering Assistant</title>
+    <meta name="description" content="AI-powered cover letters, tailored answers & auto-parsed job details—apply faster, smarter, and with personalization." />
     <meta name="author" content="Dhanavel" />
 
-    <meta property="og:title" content="CoverAI - Smart Cover Letter Generator" />
-    <meta property="og:description" content="AI-powered cover letter generator with professional profile management" />
+    <meta property="og:title" content="CoverAI – Cover Letter & Custom Question Answering Assistant" />
+    <meta property="og:description" content="AI-powered cover letters, tailored answers & auto-parsed job details—apply faster, smarter, and with personalization." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://coverai.dhanavel.com/" />
     <meta property="og:image" content="/logo1.jpeg" />
@@ -29,5 +29,73 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script id="json-ld-person" type="application/ld+json" strategy="afterInteractive">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Dhanavel",
+        "url": "https://www.dhanavel.com",
+        "image": "https://www.dhanavel.com/images/dhanavel.jpg",
+        "jobTitle": "Full Stack Developer",
+        "sameAs": [
+          "https://github.com/Dhanuvel163",
+          "https://www.linkedin.com/in/dhanavel-ramachandran-721802193",
+          "https://x.com/dhanavel19"
+        ]
+      }
+    </script>
+    <script id="software-application-ld-person-0" type="application/ld+json" strategy="afterInteractive">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "CoverAI – Cover Letter & Custom Question Answering Assistant",
+        "url": "https://coverai.dhanavel.com/",
+        "description": "AI-powered cover letters, tailored answers & auto-parsed job details—apply faster, smarter, and with personalization.",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Windows, macOS, Linux",
+        "softwareVersion": "1.1",
+        "offers": {
+          "@type": "Offer",
+          "price": "00.00",
+          "priceCurrency": "USD",
+          "url": "https://coverai.dhanavel.com/",
+          "availability": "https://schema.org/InStock"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5",
+          "ratingCount": "1"
+        }
+      }
+    </script>
+    <script id="product-application-ld-person-0" type="application/ld+json" strategy="afterInteractive">
+      {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "CoverAI – Cover Letter & Custom Question Answering Assistant",
+        "image": "https://www.dhanavel.com/images/products/cover_craft.png",
+        "description": "AI-powered cover letters, tailored answers & auto-parsed job details—apply faster, smarter, and with personalization.",
+        "sku": "12345",
+        "mpn": "67890",
+        "brand": {
+          "@type": "Brand",
+          "name": "CoverAI"
+        },
+        "offers": {
+          "@type": "Offer",
+          "url": "https://coverai.dhanavel.com/",
+          "priceCurrency": "USD",
+          "price": "00.00",
+          "priceValidUntil": "2025-12-31",
+          "itemCondition": "https://schema.org/NewCondition",
+          "availability": "https://schema.org/InStock"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5",
+          "reviewCount": "1"
+        }
+      }
+    </script>
   </body>
 </html>
